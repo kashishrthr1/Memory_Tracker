@@ -1,0 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+.login_left{
+  background-color: #4F46E5;
+  height: 100vh;
+}
+
+.login_right{
+  background-color: #EBEBEB;
+  height: 100vh;
+  padding: 2px;
+}
+
+.login_outer{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  height: 100vh;
+}

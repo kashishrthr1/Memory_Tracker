@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const protect = require("../middlewares/authMiddleware");
-const { createTopic } = require("../controllers/topicController");
 
-router.post("/", protect, createTopic);
+const protect = require("../middleware/authMiddleware");
+const { createTopicWithAssessment } = require("../controllers/topicController");
+
+router.post("/", protect, createTopicWithAssessment);
 
 module.exports = router;
+
 
 
 

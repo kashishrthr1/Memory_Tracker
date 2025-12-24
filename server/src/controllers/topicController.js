@@ -1,59 +1,41 @@
 const Topic = require("../models/Topic");
-const Assessment = require("../models/Assessment");
-const Revision = require("../models/Revision");
+const {
+  calculateAssessmentScore,
+  calculateNextRevisionDate
+} = require("../utils/memoryScore");
 
-const { calculateMemoryScore } = require("../services/memoryScoreService");
-const { getNextRevisionDate } = require("../services/revisionPlannerService");
 
-exports.createTopic = async (req, res) => {
+
+
+exports.createTopicWithAssessment = async (req, res) => {
   try {
-    const { name, confidence, recallSpeed, clarity } = req.body;
+    const { name, q1, q2, q3, q4, q5 } = req.body;
 
-    if (!name || !confidence || !recallSpeed || !clarity) {
-      return res.status(400).json({ message: "All fields required" });
+    if (!name) {
+      return res.status(400).json({ message: "Topic name required" });
     }
 
-    // 1️⃣ Create Topic
+    if ([q1, q2, q3, q4, q5].some(v => v === undefined)) {
+      return res.status(400).json({ message: "Assessment is mandatory" });
+    }
+
+    const memoryScore = calculateAssessmentScore({ q1, q2, q3, q4, q5 });
+    const nextRevisionDate = calculateNextRevisionDate(memoryScore);
+
     const topic = await Topic.create({
+      user: req.user._id,
       name,
-      user: req.user._id
-    });
-
-    // 2️⃣ Calculate memory score
-    const memoryScore = calculateMemoryScore({
-      confidence,
-      recallSpeed,
-      clarity
-    });
-
-    // 3️⃣ Save assessment
-    await Assessment.create({
-      user: req.user._id,
-      topic: topic._id,
-      confidence,
-      recallSpeed,
-      clarity,
-      calculatedScore: memoryScore
-    });
-
-    // 4️⃣ Update topic
-    topic.memoryScore = memoryScore;
-    topic.nextRevisionDate = getNextRevisionDate(memoryScore);
-    await topic.save();
-
-    // 5️⃣ Create revision log
-    await Revision.create({
-      user: req.user._id,
-      topic: topic._id,
-      type: "FIRST_TIME",
-      memoryScoreAfter: memoryScore
+      memoryScore,
+      lastUpdatedAt: new Date(),
+      nextRevisionDate
     });
 
     res.status(201).json({
       message: "Topic created successfully",
       topic
     });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

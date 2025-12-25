@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -8,11 +8,32 @@ const Navbar = () => {
       <div className="logo-circle">L</div>
 
       <div className="nav-pills">
-        <button className="nav-btn active" onClick={() => navigate("/")}>
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            isActive ? "nav-btn active" : "nav-btn"
+          }
+        >
           Home
-        </button>
-        <button className="nav-btn">Dashboard</button>
-        <button className="nav-btn">Contact</button>
+        </NavLink>
+
+        <NavLink
+          to="/dashboard"
+          className={({ isActive }) =>
+            isActive ? "nav-btn active" : "nav-btn"
+          }
+        >
+          Dashboard
+        </NavLink>
+
+        <NavLink
+          to="/contact"
+          className={({ isActive }) =>
+            isActive ? "nav-btn active" : "nav-btn"
+          }
+        >
+          Contact
+        </NavLink>
       </div>
 
       <div className="nav-actions">

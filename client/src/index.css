@@ -71,3 +71,21 @@ body {
     display: flex;
     justify-content: space-between;
   }
+
+  /* Remove underline & default link styles */
+.nav-btn {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Remove red/blue focus outline and glow */
+.nav-btn:focus,
+.nav-btn:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Prevent mobile tap highlight (important) */
+.nav-btn {
+  -webkit-tap-highlight-color: transparent;
+}

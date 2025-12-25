@@ -7,8 +7,8 @@ const Navbar = () => (
       <button className="nav-btn">Contact</button>
     </div>
     <div className="nav-actions">
-      <div className="action-box box-outline"></div>
-      <div className="action-box box-solid"></div>
+      <div className="action-box box-outline">Log In</div>
+      <div className="action-box box-solid">Register</div>
     </div>
   </nav>
 );

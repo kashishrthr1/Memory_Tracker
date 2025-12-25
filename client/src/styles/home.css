@@ -68,14 +68,21 @@
   }
   
   .action-box {
-    width: 96px;
-    height: 48px;
+    width: 108px;
+    height: 54px;
+    padding: 20px;
     border-radius: 16px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    letter-spacing: 2px;
   }
   
   .box-outline { border: 1px solid #ccc; background: white; }
-  .box-solid { background: #4f46e5; }
+  .box-solid { background: #4f46e5;
+color: white; }
   
   /* Hero */
   .hero {
@@ -104,14 +111,17 @@
   }
   
   .btn-primary {
+    margin-top: 48px;
     background: #4f46e5;
     color: white;
-    padding: 15px 40px;
+    padding: 24px 48px;
     border: none;
-    border-radius: 10px;
+    border-radius: 16px;
     font-weight: bold;
     cursor: pointer;
     font-size: 18px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+    letter-spacing: 2px;
   }
   
   /* Features & About */
@@ -127,74 +137,166 @@
     gap: 50px;
     align-items: center;
     margin-bottom: 80px;
+    
   }
+  .about-heading {
+    margin-bottom: 32px;
+    font-weight: 500;
+    font-size: 2.5rem;
+  }
+  .about-text p {
+    font-size: 1.5rem;
+  }
+  
   
   .placeholder-img {
     aspect-ratio: 1/1;
     border: 2px solid #4f46e5;
-    background: #eef2ff;
+    background: #ffffff;
     border-radius: 20px;
   }
   
+  .about-heading {
+    font-size: 36px;
+    font-weight: 600;
+    margin-bottom: 48px;
+  }
+  
+  /* Grid centered + constrained width */
   .features-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+    gap: 32px;
+    max-width: 1100px;
+    margin: 0 auto; /* centers whole section */
   }
   
+  /* Card */
   .feature-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+  
+    background: #ffffff;
+    padding: 32px 24px;
+    border-radius: 20px;
+  
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
   
+  .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Icon / placeholder */
   .feature-box {
-    aspect-ratio: 1/1;
+      height: 256px;
+    /* width: auto; */
+    border-radius: 16px;
     border: 2px solid #818cf8;
-    background: white;
+    background: #ffffff;
     margin-bottom: 20px;
-    border-radius: 12px;
   }
   
-  /* Footer */
-  .footer {
-    background: #2a2a2a;
-    color: white;
-    padding: 80px 48px;
+  /* Text */
+  .feature-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #374151;
+    max-width: 260px;
   }
   
+  
+  /* Footer base */
+.footer {
+    background: #1f1f1f;
+    color: #e5e7eb;
+    padding: 80px 48px 32px;
+  }
+  
+  /* Grid */
   .footer-grid {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
+    gap: 48px;
   }
   
-  .footer-column h4 { margin-bottom: 25px; font-size: 20px; }
+  /* Titles */
+  .footer-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #ffffff;
+  }
   
+  /* Links */
   .footer-links {
     list-style: none;
     padding: 0;
+    margin: 0;
   }
   
-  .footer-links li {
+  .footer-link {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    color: #aaa;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 15px;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: color 0.2s ease;
   }
   
+  .footer-link:hover {
+    color: #ffffff;
+  }
+  
+  /* Dot */
   .dot {
-    width: 8px;
-    height: 8px;
-    background: #4f46e5;
+    width: 6px;
+    height: 6px;
+    background: #6366f1;
     border-radius: 50%;
+    flex-shrink: 0;
+  }
+  
+  /* Profile column */
+  .footer-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
   
   .profile-circle {
-    width: 100px;
-    height: 100px;
-    background: white;
+    width: 96px;
+    height: 96px;
+    background: #ffffff;
     border-radius: 50%;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
+  
+  /* Contact info */
+  .footer-contact p {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    font-size: 15px;
+    color: #9ca3af;
+  }
+  
+  /* Bottom bar */
+  .footer-bottom {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid #2f2f2f;
+    text-align: center;
+    font-size: 14px;
+    color: #9ca3af;
+  }
+  

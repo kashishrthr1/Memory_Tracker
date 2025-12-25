@@ -68,6 +68,11 @@
     width: 60%;
     margin-top: 18vh;
   }
+
+  .register-form {
+    width: 60%;
+    margin-top: 12vh;
+  }
   
   .input-group {
     display: flex;
@@ -102,6 +107,15 @@
     display: block;
     color: #4f46e5;
     font-size: 14px;
+    cursor: pointer;
+  }
+
+  .link-action {
+    margin-bottom: 16px;
+    display: block;
+    color: #4f46e5;
+    font-size: 14px;
+    cursor: pointer;
   }
   
   .login-btn {
@@ -132,3 +146,17 @@
     display: flex;
     flex-direction: row;
   }
+
+  .register-form {
+    gap: 0.75rem;
+  }
+  
+  .register-form .login-btn {
+    margin-top: 0.5rem;
+  }
+  
+  .register-form .links {
+    margin-top: 0.5rem;
+  }
+  
+  

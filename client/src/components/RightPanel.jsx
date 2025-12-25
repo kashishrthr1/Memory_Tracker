@@ -1,9 +1,10 @@
 import LoginForm from "./LoginForm";
+import RegisterForm from "./RegisterForm";
 
-function RightPanel() {
+function RightPanel({ mode }) {
   return (
     <div className="right-panel">
-      <LoginForm />
+      {mode === "login" ? <LoginForm /> : <RegisterForm />}
     </div>
   );
 }

@@ -1,8 +1,14 @@
+import { useNavigate } from "react-router-dom";
+import { IoArrowBack } from "react-icons/io5";
+
 function LeftPanel() {
+  const navigate = useNavigate();
+
   return (
     <div className="left-panel">
       <div className="top-bar">
-        <span className="back-arrow">←</span>
+        <IoArrowBack className="back-arrow" onClick={() => navigate("/")} />
+
         <div className="avatar">L</div>
       </div>
 

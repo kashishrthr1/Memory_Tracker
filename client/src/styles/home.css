@@ -47,7 +47,7 @@
   
   
   .nav-btn {
-    padding: 20px 48px;
+    padding: 20px 46px;
     border-radius: 16px;
     border: none;
     cursor: pointer;
@@ -66,6 +66,18 @@
     display: flex;
     gap: 12px;
   }
+
+  .back-arrow {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  
+  .back-arrow:hover {
+    transform: translateX(-4px);
+    opacity: 0.8;
+  }
+  
   
   .action-box {
     width: 108px;
@@ -78,6 +90,7 @@
     align-items: center;
     font-weight: 600;
     letter-spacing: 2px;
+    cursor: pointer;
   }
   
   .box-outline { border: 1px solid #ccc; background: white; }

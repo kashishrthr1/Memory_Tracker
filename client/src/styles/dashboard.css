@@ -1,0 +1,673 @@
+.dashboard-container {
+    padding: 0rem 6rem;
+    padding-bottom: 4rem;
+    min-height: 70vh;
+  }
+  
+  .dashboard-container h1 {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* OVERVIEW LAYOUT */
+.overview {
+    margin-top: 2rem;
+  }
+  
+  /* Top section: 2:1 */
+  .overview-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .overview-text h1 {
+    font-size: 2.2rem;
+  }
+  /* Bottom section: 1:1 */
+  .overview-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  
+  /* Shared box styling */
+  .box {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Text styles */
+  .score-text {
+    margin-left: 50px;
+    margin-top: 0.5rem;
+    font-size: 2rem;
+  }
+
+  .score-subtext {
+    margin-left: 50px;
+    margin-top: 0.5rem;
+    font-size: 1.5rem;
+  }
+  
+  .label {
+    color: black;
+    font-weight: 500;
+    font-size: 2rem;
+  }
+  
+  .highlight {
+    color: #4f46e5;
+    font-weight: 700;
+    font-size: 2.5rem;
+  }
+  
+  /* Pie placeholder */
+  .pie-placeholder {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 8px solid #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: auto;
+  }
+  
+  /* Line graph placeholder */
+  .line-placeholder {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+  }
+
+  .highlight2{
+    color: #4f46e5;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+
+  .revision-box{
+    border: 4px solid #4f46e5;
+    box-shadow: #4f46e5;
+  }
+  
+  /* Revision box */
+  .revision-box p {
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .revise-question {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .revise-btn {
+    width: fit-content;
+    /* margin-left: 38%; */
+  }
+  
+  /* TOPIC LIST */
+.topic-list {
+    margin-top: 2rem;
+  }
+  
+  /* Section title */
+  .section-title {
+    margin-bottom: 1rem;
+  }
+  
+  /* Actions row */
+  .topic-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .add-topic-btn {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  
+  /* Search */
+  .search-bar {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .search-bar input {
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    width: 300px;
+    border: 1px solid #ddd;
+    outline: none;
+  }
+  
+  .search-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.75rem;
+  }
+  
+  /* Labels row */
+  .topic-labels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: #374151;
+  }
+  
+  /* Empty placeholders */
+  .topic-labels span:first-child{
+    margin-left: 75px;
+  }
+
+  
+  .topic-labels span:nth-child(2){
+    margin-left: 250px;
+  }
+
+  .topic-labels span:nth-child(3){
+    margin-left: 125px;
+  }
+  
+  /* Items */
+  .topic-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  /* List item placeholder */
+  
+  /* Grey placeholder style */
+  .placeholder {
+    background: #f1f5f9;
+  }
+  
+  /* LIST ITEM */
+  .list-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: #f8fafc;
+    overflow: hidden;
+    transition: background 0.2s ease, padding-right 0.3s ease;
+  }
+  
+  /* Reserve space on hover */
+  .list-item:hover {
+    background: #eef2ff;
+    /* padding-right: 140px; */
+  }
+  
+  /* LEFT GRID */
+  .list-left {
+    display: grid;
+    grid-template-columns: 40px 10px 2fr 1fr 1fr;
+    align-items: center;
+    width: 100%;
+    gap: 0.75rem;
+  }
+  
+  
+  /* SERIAL */
+  .serial {
+    font-weight: 600;
+    text-align: center;
+  }
+  
+  /* DIFFICULTY STRIP */
+  .difficulty-strip {
+    width: 10px;
+    height: 30px;
+    border-radius: 0px;
+  }
+  
+  .difficulty-strip.easy {
+    background: #22c55e;
+  }
+  
+  .difficulty-strip.medium {
+    background: #eab308;
+  }
+  
+  .difficulty-strip.hard {
+    background: #ef4444;
+  }
+  
+  /* Text columns */
+  .topic-name {
+    font-weight: 500;
+  }
+  
+  .topic-date,
+.topic-score {
+  color: #6b7280;
+}
+  
+  /* RIGHT SIDE */
+  .list-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+  }
+
+  .right-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+  }
+  
+  /* 3 dots button */
+  .more-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    margin-right: 12px;
+    transition: transform 0.3s ease;
+  }
+  
+  /* REVISE AREA */
+  .revise-area {
+    width: 120px;
+    height: 100%;
+    background: #4f46e5;
+    color: white;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  
+  /* HOVER INTERACTION */
+  .list-item:hover .revise-area {
+    transform: translateX(0);
+  }
+
+  /* REVISION GUIDE */
+.revision-guide {
+    margin-top: 2rem;
+  }
+  
+  /* Cards container */
+  .revision-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.25rem;
+  }
+  
+  /* Card base */
+  .revision-card {
+    border-radius: 14px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  
+  /* Make today pop */
+  .today-card {
+    /* transform: translateY(-6px); */
+    box-shadow: 0 16px 35px rgba(79, 70, 229, 0.25);
+  }
+  
+  /* Header (purple strip) */
+  .revision-card-header {
+    background: #6d67d7;
+    color: white;
+    font-weight: 600;
+    font-size: 1.05rem;   /* ⬅️ increased */
+    padding: 0.9rem 1rem; /* ⬅️ slightly taller */
+  }
+  
+  
+  /* Stronger purple for Today */
+  .today-card .revision-card-header {
+    background: #4f46e5;
+    font-size: 1.1rem;
+  }
+  
+  
+  /* Body */
+  .revision-card-body {
+    padding: 1.15rem 1rem;
+        min-height: 140px;
+      
+      
+  }
+  
+  
+  .revision-card-body ul {
+    padding-left: 1rem;
+  }
+  
+  .revision-card-body li {
+    margin-bottom: 0.55rem; /* ⬅️ was 0.4rem */
+    color: #374151;
+  }
+  
+  
+  /* Empty state */
+  .no-topics {
+    color: #9ca3af;
+    font-style: italic;
+  }
+  
+  /* RECENT ACTIVITY */
+  .recent-activity {
+    margin-top: 2rem;
+  }
+  
+  /* List */
+  .activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  /* Card */
+  .activity-item {
+    display: flex;
+    width: 100%;
+    height: 76px;
+    background: #f8fafc;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  /* Purple icon strip — TOUCHES BORDER */
+  .activity-icon {
+    width: 72px;
+    background: #4f46e5;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  /* Content */
+  .activity-content {
+    flex: 1;
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  /* Date first */
+  .activity-date {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+  }
+  
+  /* Text */
+  .activity-text {
+    font-size: 0.95rem; /* 🔴 slightly bigger */
+    color: #374151;
+    line-height: 1.35;
+  }
+  
+  /* Highlight pop */
+  .activity-highlight {
+    color: #4f46e5;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  /* Overlay */
+/* Overlay remains the same */
+/* 1. OVERLAY */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+/* 2. WINDOW STRUCTURE */
+.modal-window {
+  background: white;
+  width: 780px; /* Base width */
+  max-width: 95vw;
+  max-height: 85vh;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden; /* Clips the inner scrollable body */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* 3. CLOSE BUTTON */
+.modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: #f3f4f6;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #6b7280;
+  z-index: 20;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* 4. CONTENT WRAPPER */
+.topic-modal {
+  width: 100%; /* Occupy full width of modal-window to fix the gap */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* 5. STICKY HEADER */
+.modal-header {
+  padding: 1.5rem 2rem;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.modal-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.modal-title span {
+  color: #4f46e5;
+}
+
+.modal-sub {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 0.4rem;
+}
+
+/* 6. SCROLLABLE BODY */
+.modal-body {
+  /* Padding adjusted: 0 on right so scrollbar is at the edge */
+  padding: 2rem 1.25rem 2rem 2rem; 
+  overflow-y: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: #f9fafb; /* Gray background makes white cards pop */
+}
+
+/* 7. REUSABLE WHITE CARD STYLE (Score, Info, and Graph) */
+.modal-score-box,
+.info-card,
+.modal-graph-section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+/* 8. SCORE SECTION */
+.modal-score-box {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.score-value {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #4f46e5;
+  line-height: 1;
+  margin-top: 0.5rem;
+}
+
+.pie-placeholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #eef2ff;
+  border: 4px solid #4f46e5;
+  color: #4f46e5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+/* 9. GRID LAYOUT */
+.modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.info-card {
+  padding: 1rem;
+}
+
+.info-card.full {
+  grid-column: span 2;
+  border-left: 4px solid #4f46e5;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.info-value.highlight {
+  color: #4f46e5;
+}
+
+/* 10. GRAPH SECTION (Full width white card) */
+.modal-graph-section {
+  padding: 1.5rem;
+  /* Making it large enough to force scrolling */
+  min-height: 500px; 
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem; /* Space at the very bottom */
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.graph-placeholder {
+  flex-grow: 1;
+  width: 100%; /* Full width */
+  background: #fcfcfc;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* 11. CUSTOM SCROLLBAR */
+.modal-body::-webkit-scrollbar {
+  width: 10px;
+}
+.modal-body::-webkit-scrollbar-track {
+  background: transparent; /* Makes it feel more integrated */
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+  border: 3px solid #f9fafb; /* Creates a small gap around the thumb */
+}
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

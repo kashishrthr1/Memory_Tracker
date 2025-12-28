@@ -101,6 +101,7 @@ color: white; }
   .hero {
     padding: 80px 20px;
     text-align: center;
+    background-color: white;
   }
   
   .hero h1 {

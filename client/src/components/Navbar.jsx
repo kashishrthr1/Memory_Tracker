@@ -1,7 +1,10 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const hideAuthButtons = location.pathname === "/dashboard";
 
   return (
     <nav className="navbar">
@@ -36,21 +39,23 @@ const Navbar = () => {
         </NavLink>
       </div>
 
-      <div className="nav-actions">
-        <div
-          className="action-box box-outline"
-          onClick={() => navigate("/login")}
-        >
-          Log In
-        </div>
+      {!hideAuthButtons && (
+        <div className="nav-actions">
+          <div
+            className="action-box box-outline"
+            onClick={() => navigate("/login")}
+          >
+            Log In
+          </div>
 
-        <div
-          className="action-box box-solid"
-          onClick={() => navigate("/register")}
-        >
-          Register
+          <div
+            className="action-box box-solid"
+            onClick={() => navigate("/register")}
+          >
+            Register
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

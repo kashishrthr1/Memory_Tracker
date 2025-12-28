@@ -50,29 +50,45 @@ const TopicList = () => {
   const [topicName, setTopicName] = useState("");
   const [scoreValue, setScoreValue] = useState(50);
 
-  // Automatically sort the topics by score (lowest first)
+  // Automatically sort the topics by score (lowest first = most urgent)
   const sortedTopics = [...topics].sort((a, b) => a.score - b.score);
 
+  // Logic to update an existing topic's score (Used by Revise button in ListItem)
+  const updateTopicScore = (topicId, newScore) => {
+    setTopics((prev) =>
+      prev.map((topic) =>
+        topic.id === topicId
+          ? {
+              ...topic,
+              score: parseInt(newScore),
+              revisions: topic.revisions + 1,
+              lastRevision: new Date().toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+              }),
+              nextRevision: "Scheduled", // You can add logic here to calculate next date
+            }
+          : topic
+      )
+    );
+  };
+
   const handleFinishAssessment = () => {
-    // Create the new topic object
     const newTopic = {
-      id: Date.now(), // Unique ID based on timestamp
+      id: Date.now(),
       name: topicName,
       date: new Date().toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "short",
         year: "numeric",
-      }), // e.g. "28 Dec 2025"
+      }),
       score: parseInt(scoreValue),
       revisions: 0,
       lastRevision: "N/A",
-      nextRevision: "Tomorrow", // Mock revision date
+      nextRevision: "Tomorrow",
     };
 
-    // Add to the list
     setTopics((prev) => [...prev, newTopic]);
-
-    // Close and reset modal
     resetAddModal();
   };
 
@@ -119,7 +135,12 @@ const TopicList = () => {
 
       <div className="topic-items">
         {sortedTopics.map((topic, index) => (
-          <ListItem key={topic.id} index={index + 1} {...topic} />
+          <ListItem
+            key={topic.id}
+            index={index + 1}
+            {...topic}
+            onUpdateScore={updateTopicScore}
+          />
         ))}
       </div>
 

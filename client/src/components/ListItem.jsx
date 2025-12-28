@@ -3,6 +3,7 @@ import { MoreVertical } from "lucide-react";
 import Modal from "./Modal";
 
 const ListItem = ({
+  id,
   index,
   name,
   date,
@@ -10,20 +11,29 @@ const ListItem = ({
   revisions,
   lastRevision,
   nextRevision,
+  onUpdateScore, // Received from TopicList
 }) => {
-  const [open, setOpen] = useState(false);
+  // States for two different modals
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isReviseOpen, setIsReviseOpen] = useState(false);
+
+  // States for the revision flow
+  const [reviseStep, setReviseStep] = useState(1); // 1: Questions, 2: Complete
+  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [newScoreValue, setNewScoreValue] = useState(score);
 
   // Auto-assign urgency based on score
   const getUrgency = (s) => {
-    if (s < 60) return "hard"; // Critical/Urgent
-    if (s < 85) return "medium"; // Needs review
-    return "easy"; // Good retention
+    if (s < 60) return "hard";
+    if (s < 85) return "medium";
+    return "easy";
   };
 
   const urgency = getUrgency(score);
 
+  // Handle Scroll Lock
   useEffect(() => {
-    if (open) {
+    if (isDetailsOpen || isReviseOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -31,7 +41,30 @@ const ListItem = ({
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [open]);
+  }, [isDetailsOpen, isReviseOpen]);
+
+  // Revision Logic
+  const handleNextQuestion = () => {
+    if (currentQuestion < 5) {
+      setCurrentQuestion((prev) => prev + 1);
+    } else {
+      setReviseStep(2);
+    }
+  };
+
+  const handleFinishRevision = () => {
+    onUpdateScore(id, newScoreValue);
+    closeReviseModal();
+  };
+
+  const closeReviseModal = () => {
+    setIsReviseOpen(false);
+    setTimeout(() => {
+      setReviseStep(1);
+      setCurrentQuestion(1);
+      setNewScoreValue(score);
+    }, 300);
+  };
 
   return (
     <>
@@ -45,14 +78,17 @@ const ListItem = ({
         </div>
 
         <div className="right-actions">
-          <button className="more-btn" onClick={() => setOpen(true)}>
+          <button className="more-btn" onClick={() => setIsDetailsOpen(true)}>
             <MoreVertical size={18} />
           </button>
-          <div className="revise-area">Revise</div>
+          <div className="revise-area" onClick={() => setIsReviseOpen(true)}>
+            Revise
+          </div>
         </div>
       </div>
 
-      <Modal isOpen={open} onClose={() => setOpen(false)}>
+      {/* --- MODAL 1: TOPIC DETAILS --- */}
+      <Modal isOpen={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
         <div className="topic-modal">
           <div className="modal-header">
             <h2 className="modal-title">
@@ -63,9 +99,7 @@ const ListItem = ({
 
           <div className="modal-body">
             <div className="modal-score-box">
-              {/* NEW: Urgency strip inside the score box */}
               <span className={`difficulty-strip ${urgency}`} />
-
               <div className="score-text">
                 <p>Your Memory Score for this topic is</p>
                 <span className="score-value">{score}%</span>
@@ -97,6 +131,90 @@ const ListItem = ({
               </div>
             </div>
           </div>
+        </div>
+      </Modal>
+
+      {/* --- MODAL 2: REVISE ASSESSMENT FLOW --- */}
+      <Modal isOpen={isReviseOpen} onClose={closeReviseModal}>
+        <div className="add-flow-container">
+          {reviseStep === 1 && (
+            <div className="step-content assessment-view">
+              <div className="assessment-header">
+                <h2 className="modal-title">Revision Assessment</h2>
+                <p className="modal-sub">
+                  Topic : <strong>{name}</strong>
+                </p>
+              </div>
+
+              <div className="question-area">
+                <p className="q-text">
+                  <strong>Q{currentQuestion}</strong> How confident are you with
+                  this topic after your revision session?
+                </p>
+                <div className="slider-wrapper">
+                  <div className="slider-labels">
+                    <span>0</span>
+                    <span className="current-bubble">{newScoreValue}</span>
+                    <span>100</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={newScoreValue}
+                    onChange={(e) => setNewScoreValue(e.target.value)}
+                    className="assessment-slider"
+                  />
+                  <div className="slider-labels">
+                    <small>
+                      Barely
+                      <br />
+                      anything
+                    </small>
+                    <small>
+                      Almost
+                      <br />
+                      everything
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <div className="assessment-footer">
+                <p>Question {currentQuestion} of 5</p>
+                <button className="primary-btn" onClick={handleNextQuestion}>
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {reviseStep === 2 && (
+            <div
+              className="step-content complete-view"
+              style={{ textAlign: "center" }}
+            >
+              <h2 className="modal-title">Revision Complete</h2>
+              <p className="modal-sub">
+                Topic : <strong>{name}</strong>
+              </p>
+
+              <div className="final-score-area">
+                <p className="score-announcement">
+                  Updated Memory Score: <span>{newScoreValue}%</span>
+                </p>
+                <p className="info-sub">
+                  Your retention data has been updated.
+                </p>
+              </div>
+
+              <div className="progress-circle-mock">{newScoreValue}%</div>
+
+              <button className="primary-btn" onClick={handleFinishRevision}>
+                Update Dashboard
+              </button>
+            </div>
+          )}
         </div>
       </Modal>
     </>

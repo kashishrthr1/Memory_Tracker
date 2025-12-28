@@ -463,20 +463,19 @@
   align-items: center;
   justify-content: center;
   z-index: 999;
-  padding: 20px;
+  padding: 0; /* Ensures perfect centering */
 }
 
-/* 2. WINDOW STRUCTURE */
 .modal-window {
   background: white;
-  width: 780px; /* Base width */
+  width: 780px; 
   max-width: 95vw;
-  max-height: 85vh;
+  height: 85vh;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden; /* Clips the inner scrollable body */
+  overflow: hidden;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
@@ -496,7 +495,7 @@
   font-size: 0.9rem;
   cursor: pointer;
   color: #6b7280;
-  z-index: 20;
+  z-index: 30; /* Higher than header */
   transition: all 0.2s;
 }
 
@@ -507,10 +506,13 @@
 
 /* 4. CONTENT WRAPPER */
 .topic-modal {
-  width: 100%; /* Occupy full width of modal-window to fix the gap */
+  width: 780px; /* ⬆ ~25% bigger */
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); */
+
+
 }
 
 /* 5. STICKY HEADER */
@@ -519,7 +521,8 @@
   background: white;
   border-bottom: 1px solid #e5e7eb;
   flex-shrink: 0;
-  z-index: 10;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+
 }
 
 .modal-title {
@@ -541,40 +544,49 @@
 
 /* 6. SCROLLABLE BODY */
 .modal-body {
-  /* Padding adjusted: 0 on right so scrollbar is at the edge */
-  padding: 2rem 1.25rem 2rem 2rem; 
+  padding: 2rem;
+  /* padding-right: 1.25rem;  */
   overflow-y: auto;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  background: #f9fafb; /* Gray background makes white cards pop */
+  background: #f9fafb;
 }
 
-/* 7. REUSABLE WHITE CARD STYLE (Score, Info, and Graph) */
-.modal-score-box,
-.info-card,
-.modal-graph-section {
+/* 7. SCORE SECTION */
+.modal-score-box {
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
-}
-
-/* 8. SCORE SECTION */
-.modal-score-box {
-  padding: 1.5rem;
+  position: relative; 
+  padding: 1.5rem 1.5rem 1.5rem 2.5rem; 
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.modal-score-box .difficulty-strip {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  height: 100%;
+}
+
+.score-text{
+  margin-left: 20px;
+}
+
 .score-value {
   display: block;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 800;
   color: #4f46e5;
   line-height: 1;
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
+  margin-left: 0px;
 }
 
 .pie-placeholder {
@@ -591,26 +603,29 @@
   font-size: 0.8rem;
 }
 
-/* 9. GRID LAYOUT */
-.modal-info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
+/* 8. GRID LAYOUT */
 
-.info-card {
-  padding: 1rem;
-}
+  .modal-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .info-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
 
 .info-card.full {
   grid-column: span 2;
-  border-left: 4px solid #4f46e5;
+  border: 2px solid #4f46e5;
 }
 
 .info-label {
   font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.025em;
   color: #6b7280;
   margin-bottom: 4px;
 }
@@ -625,27 +640,32 @@
   color: #4f46e5;
 }
 
-/* 10. GRAPH SECTION (Full width white card) */
+/* 9. GRAPH SECTION */
 .modal-graph-section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
   padding: 1.5rem;
-  /* Making it large enough to force scrolling */
-  min-height: 500px; 
+  min-height: 500px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1rem; /* Space at the very bottom */
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.modal-graph-section.full {
+  grid-column: span 2;
 }
 
 .section-subtitle {
   font-size: 1.1rem;
   font-weight: 700;
   color: #1f2937;
-  margin: 0;
 }
 
 .graph-placeholder {
   flex-grow: 1;
-  width: 100%; /* Full width */
+  width: 100%;
   background: #fcfcfc;
   border: 2px dashed #e2e8f0;
   border-radius: 12px;
@@ -656,18 +676,22 @@
   font-weight: 500;
 }
 
-/* 11. CUSTOM SCROLLBAR */
+/* 10. CUSTOM SCROLLBAR */
 .modal-body::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
+
 .modal-body::-webkit-scrollbar-track {
-  background: transparent; /* Makes it feel more integrated */
+  background: transparent;
 }
+
 .modal-body::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #d1d5db;
   border-radius: 10px;
-  border: 3px solid #f9fafb; /* Creates a small gap around the thumb */
+  /* Thin effect */
+  border: 2px solid #f9fafb; 
 }
+
 .modal-body::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }

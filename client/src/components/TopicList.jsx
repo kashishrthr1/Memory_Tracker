@@ -2,7 +2,6 @@ import { useState } from "react";
 import ListItem from "./ListItem";
 import Modal from "./Modal";
 
-// Initial data moved inside the component state
 const INITIAL_DATA = [
   {
     id: 1,
@@ -43,17 +42,19 @@ const INITIAL_DATA = [
 ];
 
 const TopicList = () => {
-  const [topics, setTopics] = useState(INITIAL_DATA); // State to hold all topics
+  const [topics, setTopics] = useState(INITIAL_DATA);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addStep, setAddStep] = useState(1);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [topicName, setTopicName] = useState("");
   const [scoreValue, setScoreValue] = useState(50);
 
-  // Automatically sort the topics by score (lowest first = most urgent)
-  const sortedTopics = [...topics].sort((a, b) => a.score - b.score);
+  const filteredAndSortedTopics = topics
+    .filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => a.score - b.score);
 
-  // Logic to update an existing topic's score (Used by Revise button in ListItem)
   const updateTopicScore = (topicId, newScore) => {
     setTopics((prev) =>
       prev.map((topic) =>
@@ -66,7 +67,7 @@ const TopicList = () => {
                 day: "2-digit",
                 month: "short",
               }),
-              nextRevision: "Scheduled", // You can add logic here to calculate next date
+              nextRevision: "Scheduled",
             }
           : topic
       )
@@ -103,11 +104,8 @@ const TopicList = () => {
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestion < 5) {
-      setCurrentQuestion((prev) => prev + 1);
-    } else {
-      setAddStep(3);
-    }
+    if (currentQuestion < 5) setCurrentQuestion((p) => p + 1);
+    else setAddStep(3);
   };
 
   return (
@@ -121,9 +119,14 @@ const TopicList = () => {
         >
           + Add Topic
         </button>
+
         <div className="search-bar">
-          <input type="text" placeholder="Search topic..." />
-          <button className="search-btn">Search</button>
+          <input
+            type="text"
+            placeholder="Search topic..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
 
@@ -134,7 +137,11 @@ const TopicList = () => {
       </div>
 
       <div className="topic-items">
-        {sortedTopics.map((topic, index) => (
+        {filteredAndSortedTopics.length === 0 && (
+          <p className="empty-state">No topics found</p>
+        )}
+
+        {filteredAndSortedTopics.map((topic, index) => (
           <ListItem
             key={topic.id}
             index={index + 1}
@@ -144,12 +151,15 @@ const TopicList = () => {
         ))}
       </div>
 
+      {/* ✅ ADD TOPIC MODAL — FIXED */}
       <Modal isOpen={isAddModalOpen} onClose={resetAddModal}>
         <div className="add-flow-container">
-          {/* STEP 1: PROMPT */}
+          {" "}
+          {/* STEP 1: PROMPT */}{" "}
           {addStep === 1 && (
             <div className="step-content prompt-view">
-              <h2 className="add-topic-title">Topic Name</h2>
+              {" "}
+              <h2 className="add-topic-title">Topic Name</h2>{" "}
               <input
                 type="text"
                 className="add-topic-input"
@@ -157,45 +167,55 @@ const TopicList = () => {
                 onChange={(e) => setTopicName(e.target.value)}
                 placeholder="Enter topic name..."
                 autoFocus
-              />
+              />{" "}
               <div className="add-topic-info">
-                <p className="info-main">Please go through the assessment</p>
+                {" "}
+                <p className="info-main">
+                  Please go through the assessment
+                </p>{" "}
                 <p className="info-sub">
+                  {" "}
                   This is not a test. Just answer honestly so we can track your
-                  memory over time.
-                </p>
-              </div>
+                  memory over time.{" "}
+                </p>{" "}
+              </div>{" "}
               <button
                 className="start-assessment-btn"
                 onClick={() => setAddStep(2)}
                 disabled={!topicName.trim()}
               >
-                Start Assessment
-              </button>
+                {" "}
+                Start Assessment{" "}
+              </button>{" "}
             </div>
-          )}
-
-          {/* STEP 2: ASSESSMENT */}
+          )}{" "}
+          {/* STEP 2: ASSESSMENT */}{" "}
           {addStep === 2 && (
             <div className="step-content assessment-view">
+              {" "}
               <div className="assessment-header">
-                <h2 className="modal-title">Assessment</h2>
+                {" "}
+                <h2 className="modal-title">Assessment</h2>{" "}
                 <p className="modal-sub">
-                  Topic : <strong>{topicName}</strong>
-                </p>
-              </div>
-
+                  {" "}
+                  Topic : <strong>{topicName}</strong>{" "}
+                </p>{" "}
+              </div>{" "}
               <div className="question-area">
+                {" "}
                 <p className="q-text">
+                  {" "}
                   <strong>Q{currentQuestion}</strong> If you had to explain this
-                  topic to someone right now, how confident are you?
-                </p>
+                  topic to someone right now, how confident are you?{" "}
+                </p>{" "}
                 <div className="slider-wrapper">
+                  {" "}
                   <div className="slider-labels">
-                    <span>0</span>
-                    <span className="current-bubble">{scoreValue}</span>
-                    <span>100</span>
-                  </div>
+                    {" "}
+                    <span>0</span>{" "}
+                    <span className="current-bubble">{scoreValue}</span>{" "}
+                    <span>100</span>{" "}
+                  </div>{" "}
                   <input
                     type="range"
                     min="0"
@@ -203,59 +223,61 @@ const TopicList = () => {
                     value={scoreValue}
                     onChange={(e) => setScoreValue(e.target.value)}
                     className="assessment-slider"
-                  />
+                  />{" "}
                   <div className="slider-labels">
+                    {" "}
                     <small>
-                      Barely
-                      <br />
-                      anything
-                    </small>
+                      {" "}
+                      Barely <br /> anything{" "}
+                    </small>{" "}
                     <small>
-                      Almost
-                      <br />
-                      everything
-                    </small>
-                  </div>
-                </div>
-              </div>
-
+                      {" "}
+                      Almost <br /> everything{" "}
+                    </small>{" "}
+                  </div>{" "}
+                </div>{" "}
+              </div>{" "}
               <div className="assessment-footer">
-                <p>Question {currentQuestion} of 5</p>
+                {" "}
+                <p>Question {currentQuestion} of 5</p>{" "}
                 <button className="primary-btn" onClick={handleNextQuestion}>
-                  Next
-                </button>
-              </div>
+                  {" "}
+                  Next{" "}
+                </button>{" "}
+              </div>{" "}
             </div>
-          )}
-
-          {/* STEP 3: COMPLETE & SAVE */}
+          )}{" "}
+          {/* STEP 3: COMPLETE & SAVE */}{" "}
           {addStep === 3 && (
             <div
               className="step-content complete-view"
               style={{ textAlign: "center" }}
             >
-              <h2 className="modal-title">Assessment Complete</h2>
+              {" "}
+              <h2 className="modal-title">Assessment Complete</h2>{" "}
               <p className="modal-sub">
-                Topic : <strong>{topicName}</strong>
-              </p>
-
+                {" "}
+                Topic : <strong>{topicName}</strong>{" "}
+              </p>{" "}
               <div className="final-score-area">
+                {" "}
                 <p className="score-announcement">
+                  {" "}
                   Your Memory Score after evaluation is{" "}
-                  <span>{scoreValue}%</span>
-                </p>
+                  <span>{scoreValue}%</span>{" "}
+                </p>{" "}
                 <p className="info-sub">
-                  This is your current confidence-based memory level.
-                </p>
-              </div>
-
-              <div className="progress-circle-mock">{scoreValue}%</div>
-
+                  {" "}
+                  This is your current confidence-based memory level.{" "}
+                </p>{" "}
+              </div>{" "}
+              <div className="progress-circle-mock">{scoreValue}%</div>{" "}
               <button className="primary-btn" onClick={handleFinishAssessment}>
-                Dashboard
-              </button>
+                {" "}
+                Dashboard{" "}
+              </button>{" "}
             </div>
-          )}
+          )}{" "}
         </div>
       </Modal>
     </section>

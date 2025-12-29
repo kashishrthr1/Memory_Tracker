@@ -6,7 +6,8 @@ const topicSchema = new mongoose.Schema(
     name: { type: String, required: true },
 
     memoryScore: { type: Number, required: true },
-    lastUpdatedAt: { type: Date, required: true },
+    lastRevisedAt: { type: Date, required: true },
+    lastDecayAt: { type: Date, required: true }, 
     nextRevisionDate: { type: Date, required: true },
 
     revisionCount: { type: Number, default: 0 }

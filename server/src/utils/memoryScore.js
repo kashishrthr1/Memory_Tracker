@@ -14,15 +14,10 @@ exports.getDecayRate = (score) => {
   if (score >= 40) return 3;
   return 4;
 };
-exports.applyDecay = (score, lastUpdatedAt) => {
-  const daysPassed = Math.floor(
-    (Date.now() - new Date(lastUpdatedAt)) / (1000 * 60 * 60 * 24)
-  );
-
-  if (daysPassed <= 0) return score;
-
-  const decay = daysPassed * exports.getDecayRate(score);
-  return Math.max(0, score - decay);
+exports.applyDecay = (score, days) => {
+  const decayRate = exports.getDecayRate(score);
+  const decayed = score - days * decayRate;
+  return Math.max(0, Math.round(decayed));
 };
 exports.calculateNextRevisionDate = (score) => {
   const days = Math.max(1, Math.round((score / 100) * 7));

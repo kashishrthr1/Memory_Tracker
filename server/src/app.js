@@ -9,5 +9,6 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/topics", require("./routes/topicRoutes"));
 
 module.exports = app;

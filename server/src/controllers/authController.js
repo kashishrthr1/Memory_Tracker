@@ -9,22 +9,19 @@ const generateToken = (id) => {
   });
 };
 
-// REGISTER USER
+// REGISTER
 exports.register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // create user
     const user = await User.create({
       username,
       email,
@@ -45,18 +42,16 @@ exports.register = async (req, res) => {
   }
 };
 
-// LOGIN USER
+// LOGIN
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // find user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -75,8 +70,8 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// GET CURRENT USER
 exports.getMe = (req, res) => {
-  res.status(200).json({
-    user: req.user
-  });
+  res.status(200).json(req.user);
 };

@@ -38,9 +38,14 @@
 // );
 // export default Features;
 
-import { Zap, Target, BarChart3 } from "lucide-react";
+import { Zap, Target, BarChart3, MoveRight } from "lucide-react";
+import { useState } from "react";
+import forgettingCurve from "../assets/forgetting-curve.png";
+import forgettingCurveRevision from "../assets/forgetting-curve-revision.png";
 
 const Features = () => {
+  const [activeGraph, setActiveGraph] = useState("forgetting");
+
   const featuresList = [
     {
       title: "Smart Tracking",
@@ -64,27 +69,63 @@ const Features = () => {
       {/* --- ABOUT SECTION --- */}
       <div className="about-grid">
         <div className="about-image-container">
-          <div className="placeholder-img">
-            {/* This represents where your main product screenshot or illustration goes */}
-            <div className="inner-glow"></div>
-          </div>
-        </div>
+          {/* Sublte Curved Purple Arrow */}
 
+          <img
+            src={forgettingCurve}
+            className={`about-graph graph-1 ${
+              activeGraph === "forgetting" ? "is-front" : "is-back"
+            }`}
+            onMouseEnter={() => setActiveGraph("forgetting")}
+          />
+
+          <img
+            src={forgettingCurveRevision}
+            className={`about-graph graph-2 ${
+              activeGraph === "revision" ? "is-front" : "is-back"
+            }`}
+            onMouseEnter={() => setActiveGraph("revision")}
+          />
+        </div>
         <div className="about-text">
-          <h2 className="about-heading">Redefining Revision.</h2>
-          <p>
-            Traditional studying is broken. You spend hours reading, only to
-            forget 80% of it within a week. We built this because we were tired
-            of the "trash" standard of learning.
-          </p>
-          <p>
-            Our platform uses <strong>spaced-repetition logic</strong> to ensure
-            your efforts actually stick. It’s the easiest way to turn a "C" into
-            an "A" without doubling your study time.
-          </p>
-          <p className="about-highlight">
-            It will be worth it, we promise. You won't regret the decision.
-          </p>
+          {/* The key={activeGraph} ensures the animation plays every time the state changes */}
+          <div key={activeGraph} className="fade-in">
+            {activeGraph === "forgetting" ? (
+              <>
+                <h2 className="about-heading">
+                  Why Traditional Studying Fails
+                </h2>
+                <p>
+                  Human memory decays rapidly. Without timely revision, most of
+                  what you study fades within days — no matter how long you
+                  spent learning it.
+                </p>
+                <p>
+                  This curve represents the natural forgetting process that
+                  every student experiences.
+                </p>
+                <p className="about-highlight">
+                  Hard work alone is not enough.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="about-heading">How Smart Revision Fixes It</h2>
+                <p>
+                  Strategic revisions interrupt the forgetting curve at the
+                  perfect moment, strengthening memory exactly when it’s about
+                  to fade.
+                </p>
+                <p>
+                  Our system schedules these revisions automatically using
+                  <strong> spaced-repetition logic</strong>.
+                </p>
+                <p className="about-highlight">
+                  Same effort. Permanently better results.
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

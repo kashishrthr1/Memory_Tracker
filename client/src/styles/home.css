@@ -120,7 +120,8 @@ body, html {
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
+  
   padding: 0 20px;
   overflow: hidden;
 }
@@ -355,48 +356,82 @@ body, html {
   margin-bottom: 60px;
 }
 
+/* --- Creative Features Grid --- */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
+  gap: 40px; /* Increased gap for breathing room */
+  padding-top: 20px;
 }
 
-/* --- Feature Cards --- */
 .feature-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Left aligned looks more professional */
-  text-align: left;
   background: #ffffff;
-  padding: 40px;
-  border-radius: 24px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 50px 40px;
+  border-radius: 32px; /* Smoother, rounder corners */
+  border: 1px solid rgba(241, 245, 249, 1);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); /* Ultra smooth ease-out */
+  overflow: hidden; /* For the decorative number */
+  z-index: 1;
 }
 
+/* The "Lift and Glow" Effect */
 .feature-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.1);
-  border-color: #e2e8f0;
+  transform: translateY(-12px) scale(1.02);
+  border-color: rgba(79, 70, 229, 0.3);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.05),
+    0 0 0 4px rgba(79, 70, 229, 0.05); /* Outer halo */
 }
 
+/* Decorative Background Numbering */
+.feature-card::before {
+  content: "0" counter(feature-counter);
+  counter-increment: feature-counter;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 8rem;
+  font-weight: 900;
+  color: #f8fafc; /* Very faint gray */
+  z-index: -1;
+  transition: all 0.5s ease;
+}
+
+.feature-card:hover::before {
+  color: #f5f3ff; /* Shifts to very faint purple on hover */
+  transform: translateX(-10px) translateY(10px);
+}
+
+.content-section {
+  counter-reset: feature-counter; /* Initializes the numbering */
+}
+
+/* Icon Box Upgrade */
 .feature-icon-box {
-  width: 64px;
-  height: 64px;
-  background: #f5f3ff;
-  border-radius: 16px;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 1);
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon-box {
+  transform: rotate(-10deg) scale(1.1);
 }
 
 .feature-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 12px;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+  margin-bottom: 16px;
 }
 
 .feature-text {
@@ -404,6 +439,20 @@ body, html {
   line-height: 1.6;
   color: #64748b;
   margin: 0;
+}
+
+.feature-link {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-link {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* Responsive Fixes */

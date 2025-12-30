@@ -22,6 +22,7 @@
 // export default Hero;
 
 import { useNavigate } from "react-router-dom";
+import bgImage from "../assets/Rectangle 125.png";
 
 const Hero = () => {
   const navigate = useNavigate();

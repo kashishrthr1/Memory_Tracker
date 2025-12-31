@@ -34,6 +34,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
+import logo1 from "../assets/logo1.svg";
 
 function LeftPanel({ mode }) {
   const navigate = useNavigate();
@@ -44,7 +45,9 @@ function LeftPanel({ mode }) {
         <div className="back-circle" onClick={() => navigate("/")}>
           <IoArrowBack className="back-arrow" />
         </div>
-        <div className="avatar">L</div>
+        <div className="logo-circle">
+          <img src={logo1} alt="DejaLearn logo" className="logo-img" />
+        </div>
       </div>
 
       <div className="welcome-content">

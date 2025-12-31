@@ -38,6 +38,8 @@
 
 // export default Footer;
 
+import logo1 from "../assets/logo1.svg";
+
 const Footer = () => {
   const sections = [
     {
@@ -74,7 +76,9 @@ const Footer = () => {
         {/* Profile / Brand column */}
         <div className="footer-column footer-profile">
           <div className="profile-circle">
-            <span className="brand-initial">L</span>
+            <div className="logo-circle">
+              <img src={logo1} alt="DejaLearn logo" className="logo-img" />
+            </div>
           </div>
 
           <div className="footer-contact">

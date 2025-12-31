@@ -64,6 +64,8 @@
 
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import logoIcon from "../assets/logo1.svg";
+import fullLogo from "../assets/fullLogo.svg";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -81,7 +83,10 @@ const Navbar = () => {
 
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
-      <div className="logo-circle">L</div>
+      <div className="logo-switch">
+        <img src={logoIcon} alt="Logo icon" className="logo-icon" />
+        <img src={fullLogo} alt="Full logo" className="logo-full" />
+      </div>
 
       <div className="nav-pills">
         <NavLink

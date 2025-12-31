@@ -14,6 +14,14 @@ const ListItem = ({
   onUpdateScore, // Received from TopicList
 }) => {
   // States for two different modals
+  const [answers, setAnswers] = useState({
+    q1: score,
+    q2: score,
+    q3: score,
+    q4: score,
+    q5: score,
+  });
+
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isReviseOpen, setIsReviseOpen] = useState(false);
 
@@ -53,7 +61,7 @@ const ListItem = ({
   };
 
   const handleFinishRevision = () => {
-    onUpdateScore(id, newScoreValue);
+    onUpdateScore(id, answers);
     closeReviseModal();
   };
 
@@ -154,15 +162,23 @@ const ListItem = ({
                 <div className="slider-wrapper">
                   <div className="slider-labels">
                     <span>0</span>
-                    <span className="current-bubble">{newScoreValue}</span>
+                    <span className="current-bubble">
+                      {answers[`q${currentQuestion}`]}
+                    </span>
+
                     <span>100</span>
                   </div>
                   <input
                     type="range"
                     min="0"
                     max="100"
-                    value={newScoreValue}
-                    onChange={(e) => setNewScoreValue(e.target.value)}
+                    value={answers[`q${currentQuestion}`]}
+                    onChange={(e) =>
+                      setAnswers((prev) => ({
+                        ...prev,
+                        [`q${currentQuestion}`]: Number(e.target.value),
+                      }))
+                    }
                     className="assessment-slider"
                   />
                   <div className="slider-labels">

@@ -39,15 +39,113 @@ body, html {
 .logo-circle {
   width: 64px;
   height: 64px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 50%;
+  border-radius: 20px;
+
+  /* Cleaner background */
+  background: linear-gradient(145deg, #ffffff, #f5f5f5);
+
+  /* Softer, layered shadow (feels premium) */
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
+.logo-img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+
+  /* Makes SVG colors crisp */
+  display: block;
+}
+
+.logo-circle:hover {
+  transform: translateY(-1px) scale(1.03);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.logo-switch {
+  position: relative;
+  height: 64px;
+  width: 64px;
+  border-radius: 20px;
+
+  background: linear-gradient(145deg, #ffffff, #f5f5f5);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+
+  transition: width 0.35s ease, box-shadow 0.25s ease;
+}
+
+.logo-icon {
+  width: 80%;
+  height: 80%;
+  margin: auto;
+
+  transition: opacity 0.25s ease, transform 0.35s ease;
+}
+
+.logo-full {
+  position: absolute;
+  left: 16px;
+
+  height: 55px;
+  opacity: 0;
+  transform: translateX(20px);
+
+  transition: opacity 0.25s ease, transform 0.35s ease;
+}
+
+.logo-switch:hover {
+  width: 170px; /* adjust to your full logo width */
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.logo-switch:hover .logo-icon {
+  opacity: 0;
+  transform: translateX(-10px) scale(0.9);
+}
+
+.logo-switch:hover .logo-full {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 768px) {
+  .logo-switch:hover {
+    width: 64px;
+  }
+
+  .logo-switch:hover .logo-full {
+    opacity: 0;
+  }
+
+  .logo-switch:hover .logo-icon {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
 
 .nav-pills {
   position: absolute;
@@ -684,7 +782,6 @@ body, html {
 .profile-circle {
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, #4f46e5, #9333ea);
   border-radius: 20px; /* Squircle looks more modern than a circle */
   margin-bottom: 24px;
   display: flex;

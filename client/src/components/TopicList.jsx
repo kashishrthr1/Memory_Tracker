@@ -1,152 +1,107 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ListItem from "./ListItem";
 import Modal from "./Modal";
-
-// Initial data moved inside the component state
-const INITIAL_DATA = [
-  {
-    id: 1,
-    name: "Photosynthesis",
-    date: "10 Apr 2025",
-    score: 82,
-    revisions: 5,
-    lastRevision: "08 Apr 2025",
-    nextRevision: "12 Apr 2025",
-  },
-  {
-    id: 2,
-    name: "React Hooks",
-    date: "12 Apr 2025",
-    score: 94,
-    revisions: 12,
-    lastRevision: "11 Apr 2025",
-    nextRevision: "14 Apr 2025",
-  },
-  {
-    id: 3,
-    name: "Quantum Mechanics",
-    date: "05 Apr 2025",
-    score: 45,
-    revisions: 2,
-    lastRevision: "06 Apr 2025",
-    nextRevision: "07 Apr 2025",
-  },
-  {
-    id: 4,
-    name: "World War II",
-    date: "15 Mar 2025",
-    score: 72,
-    revisions: 8,
-    lastRevision: "10 Apr 2025",
-    nextRevision: "18 Apr 2025",
-  },
-];
+import { fetchTopics, createTopic } from "../api/topic";
 
 const TopicList = () => {
-  const [topics, setTopics] = useState(INITIAL_DATA); // State to hold all topics
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addStep, setAddStep] = useState(1);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [topicName, setTopicName] = useState("");
-  const [scoreValue, setScoreValue] = useState(50);
+  
+  // State for assessment answers q1 through q5
+  const [answers, setAnswers] = useState({ q1: 50, q2: 50, q3: 50, q4: 50, q5: 50 });
 
-  // Automatically sort the topics by score (lowest first = most urgent)
-  const sortedTopics = [...topics].sort((a, b) => a.score - b.score);
+  useEffect(() => {
+    loadTopics();
+  }, []);
 
-  // Logic to update an existing topic's score (Used by Revise button in ListItem)
-  const updateTopicScore = (topicId, newScore) => {
-    setTopics((prev) =>
-      prev.map((topic) =>
-        topic.id === topicId
-          ? {
-              ...topic,
-              score: parseInt(newScore),
-              revisions: topic.revisions + 1,
-              lastRevision: new Date().toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "short",
-              }),
-              nextRevision: "Scheduled", // You can add logic here to calculate next date
-            }
-          : topic
-      )
-    );
+  const loadTopics = async () => {
+    try {
+      const res = await fetchTopics();
+      setTopics(res.data);
+    } catch (err) {
+      console.error("Error loading topics:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleFinishAssessment = () => {
-    const newTopic = {
-      id: Date.now(),
-      name: topicName,
-      date: new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }),
-      score: parseInt(scoreValue),
-      revisions: 0,
-      lastRevision: "N/A",
-      nextRevision: "Tomorrow",
-    };
+  const filteredAndSortedTopics = topics
+    .filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => a.memoryScore - b.memoryScore);
 
-    setTopics((prev) => [...prev, newTopic]);
-    resetAddModal();
+  const handleFinishAssessment = async () => {
+    try {
+      // payload matches backend: { name, q1, q2, q3, q4, q5 }
+      await createTopic({ name: topicName, ...answers });
+      loadTopics(); // Refresh list from DB
+      resetAddModal();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to create topic");
+    }
   };
 
   const resetAddModal = () => {
     setIsAddModalOpen(false);
-    setTimeout(() => {
-      setAddStep(1);
-      setCurrentQuestion(1);
-      setTopicName("");
-      setScoreValue(50);
-    }, 300);
+    setAddStep(1);
+    setCurrentQuestion(1);
+    setTopicName("");
+    setAnswers({ q1: 50, q2: 50, q3: 50, q4: 50, q5: 50 });
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestion < 5) {
-      setCurrentQuestion((prev) => prev + 1);
-    } else {
-      setAddStep(3);
-    }
+    if (currentQuestion < 5) setCurrentQuestion((p) => p + 1);
+    else setAddStep(3);
   };
+
+  if (loading) return <div className="loading">Loading your topics...</div>;
 
   return (
     <section className="topic-list box">
       <h2 className="section-title">Topic List</h2>
 
       <div className="topic-actions">
-        <button
-          className="add-topic-btn"
-          onClick={() => setIsAddModalOpen(true)}
-        >
+        <button className="add-topic-btn" onClick={() => setIsAddModalOpen(true)}>
           + Add Topic
         </button>
         <div className="search-bar">
-          <input type="text" placeholder="Search topic..." />
-          <button className="search-btn">Search</button>
+          <input
+            type="text"
+            placeholder="Search topic..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
 
       <div className="topic-labels">
         <span>Name</span>
-        <span>Date</span>
+        <span>Created</span>
         <span>Memory Score</span>
       </div>
 
       <div className="topic-items">
-        {sortedTopics.map((topic, index) => (
-          <ListItem
-            key={topic.id}
-            index={index + 1}
-            {...topic}
-            onUpdateScore={updateTopicScore}
-          />
-        ))}
+        {filteredAndSortedTopics.length === 0 ? (
+          <p className="empty-state">No topics found. Start your learning journey by adding a topic!</p>
+        ) : (
+          filteredAndSortedTopics.map((topic, index) => (
+            <ListItem
+              key={topic._id}
+              index={index + 1}
+              {...topic}
+              onRefresh={loadTopics}
+            />
+          ))
+        )}
       </div>
 
       <Modal isOpen={isAddModalOpen} onClose={resetAddModal}>
         <div className="add-flow-container">
-          {/* STEP 1: PROMPT */}
           {addStep === 1 && (
             <div className="step-content prompt-view">
               <h2 className="add-topic-title">Topic Name</h2>
@@ -155,18 +110,11 @@ const TopicList = () => {
                 className="add-topic-input"
                 value={topicName}
                 onChange={(e) => setTopicName(e.target.value)}
-                placeholder="Enter topic name..."
+                placeholder="e.g. Quantum Physics"
                 autoFocus
               />
-              <div className="add-topic-info">
-                <p className="info-main">Please go through the assessment</p>
-                <p className="info-sub">
-                  This is not a test. Just answer honestly so we can track your
-                  memory over time.
-                </p>
-              </div>
-              <button
-                className="start-assessment-btn"
+              <button 
+                className="start-assessment-btn" 
                 onClick={() => setAddStep(2)}
                 disabled={!topicName.trim()}
               >
@@ -175,85 +123,34 @@ const TopicList = () => {
             </div>
           )}
 
-          {/* STEP 2: ASSESSMENT */}
           {addStep === 2 && (
             <div className="step-content assessment-view">
-              <div className="assessment-header">
-                <h2 className="modal-title">Assessment</h2>
-                <p className="modal-sub">
-                  Topic : <strong>{topicName}</strong>
-                </p>
-              </div>
-
+              <h2 className="modal-title">Assessment: {topicName}</h2>
               <div className="question-area">
-                <p className="q-text">
-                  <strong>Q{currentQuestion}</strong> If you had to explain this
-                  topic to someone right now, how confident are you?
-                </p>
+                <p className="q-text"><strong>Q{currentQuestion}</strong> How confident are you on a scale of 0-100?</p>
                 <div className="slider-wrapper">
-                  <div className="slider-labels">
-                    <span>0</span>
-                    <span className="current-bubble">{scoreValue}</span>
-                    <span>100</span>
-                  </div>
+                  <span className="current-bubble">{answers[`q${currentQuestion}`]}%</span>
                   <input
                     type="range"
-                    min="0"
-                    max="100"
-                    value={scoreValue}
-                    onChange={(e) => setScoreValue(e.target.value)}
+                    min="0" max="100"
+                    value={answers[`q${currentQuestion}`]}
+                    onChange={(e) => setAnswers({...answers, [`q${currentQuestion}`]: parseInt(e.target.value)})}
                     className="assessment-slider"
                   />
-                  <div className="slider-labels">
-                    <small>
-                      Barely
-                      <br />
-                      anything
-                    </small>
-                    <small>
-                      Almost
-                      <br />
-                      everything
-                    </small>
-                  </div>
                 </div>
               </div>
-
               <div className="assessment-footer">
                 <p>Question {currentQuestion} of 5</p>
-                <button className="primary-btn" onClick={handleNextQuestion}>
-                  Next
-                </button>
+                <button className="primary-btn" onClick={handleNextQuestion}>Next</button>
               </div>
             </div>
           )}
 
-          {/* STEP 3: COMPLETE & SAVE */}
           {addStep === 3 && (
-            <div
-              className="step-content complete-view"
-              style={{ textAlign: "center" }}
-            >
-              <h2 className="modal-title">Assessment Complete</h2>
-              <p className="modal-sub">
-                Topic : <strong>{topicName}</strong>
-              </p>
-
-              <div className="final-score-area">
-                <p className="score-announcement">
-                  Your Memory Score after evaluation is{" "}
-                  <span>{scoreValue}%</span>
-                </p>
-                <p className="info-sub">
-                  This is your current confidence-based memory level.
-                </p>
-              </div>
-
-              <div className="progress-circle-mock">{scoreValue}%</div>
-
-              <button className="primary-btn" onClick={handleFinishAssessment}>
-                Dashboard
-              </button>
+            <div className="step-content complete-view" style={{ textAlign: "center" }}>
+              <h2>Assessment Complete</h2>
+              <p>Ready to track <strong>{topicName}</strong>?</p>
+              <button className="primary-btn" onClick={handleFinishAssessment}>Add to Dashboard</button>
             </div>
           )}
         </div>

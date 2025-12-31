@@ -5,9 +5,11 @@ const protect = require("../middleware/authMiddleware");
 const { createTopicWithAssessment } = require("../controllers/topicController");
 const { reviseTopic } = require("../controllers/topicController");
 const { getRevisionCalendar } = require("../controllers/calendarController");
+const {getTopics}=require("../controllers/topicController");
 
 router.post("/", protect, createTopicWithAssessment);
 router.post("/:id/revise", protect, reviseTopic);
+router.get("/", protect, getTopics);
 router.get("/revision-calendar", protect, getRevisionCalendar);
 
 module.exports = router;

@@ -40,6 +40,14 @@ exports.createTopicWithAssessment = async (req, res) => {
   }
 };
 
+exports.getTopics = async (req, res) => {
+  try {
+    const topics = await Topic.find({ user: req.user._id }).sort({ createdAt: -1 });
+    res.json(topics);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 
 exports.reviseTopic = async (req, res) => {

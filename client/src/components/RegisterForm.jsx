@@ -41,7 +41,9 @@ function RegisterForm() {
           password: formData.password
         }
       );
+
       setMessage(res.data.message);
+      
       navigate("/login"); // redirect to login after successful registration
     } catch (err) {
       setMessage(err.response?.data?.message || "Registration failed");

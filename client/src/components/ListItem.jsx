@@ -1,220 +1,88 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MoreVertical } from "lucide-react";
 import Modal from "./Modal";
+import { reviseTopic } from "../api/topic";
 
-const ListItem = ({
-  id,
-  index,
-  name,
-  date,
-  score,
-  revisions,
-  lastRevision,
-  nextRevision,
-  onUpdateScore, // Received from TopicList
-}) => {
-  // States for two different modals
+const ListItem = ({ _id, index, name, createdAt, memoryScore, revisionCount, lastRevisedAt, nextRevisionDate, onRefresh }) => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isReviseOpen, setIsReviseOpen] = useState(false);
-
-  // States for the revision flow
-  const [reviseStep, setReviseStep] = useState(1); // 1: Questions, 2: Complete
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [newScoreValue, setNewScoreValue] = useState(score);
+  const [reviseStep, setReviseStep] = useState(1);
+  const [answers, setAnswers] = useState({ q1: 50, q2: 50, q3: 50, q4: 50, q5: 50 });
 
-  // Auto-assign urgency based on score
-  const getUrgency = (s) => {
-    if (s < 60) return "hard";
-    if (s < 85) return "medium";
-    return "easy";
-  };
-
-  const urgency = getUrgency(score);
-
-  // Handle Scroll Lock
-  useEffect(() => {
-    if (isDetailsOpen || isReviseOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+  const handleFinishRevision = async () => {
+    try {
+      await reviseTopic(_id, answers);
+      onRefresh(); // Re-fetch all topics to show updated scores/decay
+      closeReviseModal();
+    } catch (err) {
+      alert("Error updating revision");
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isDetailsOpen, isReviseOpen]);
-
-  // Revision Logic
-  const handleNextQuestion = () => {
-    if (currentQuestion < 5) {
-      setCurrentQuestion((prev) => prev + 1);
-    } else {
-      setReviseStep(2);
-    }
-  };
-
-  const handleFinishRevision = () => {
-    onUpdateScore(id, newScoreValue);
-    closeReviseModal();
   };
 
   const closeReviseModal = () => {
     setIsReviseOpen(false);
-    setTimeout(() => {
-      setReviseStep(1);
-      setCurrentQuestion(1);
-      setNewScoreValue(score);
-    }, 300);
+    setReviseStep(1);
+    setCurrentQuestion(1);
+    setAnswers({ q1: 50, q2: 50, q3: 50, q4: 50, q5: 50 });
   };
+
+  const urgencyClass = memoryScore < 40 ? "hard" : memoryScore < 75 ? "medium" : "easy";
 
   return (
     <>
       <div className="list-item">
         <div className="list-left">
           <span className="serial">{index}</span>
-          <span className={`difficulty-strip ${urgency}`} />
+          <span className={`difficulty-strip ${urgencyClass}`} />
           <span className="topic-name">{name}</span>
-          <span className="topic-date">{date}</span>
-          <span className="topic-score">{score}%</span>
+          <span className="topic-date">{new Date(createdAt).toLocaleDateString()}</span>
+          <span className="topic-score">{memoryScore}%</span>
         </div>
 
         <div className="right-actions">
-          <button className="more-btn" onClick={() => setIsDetailsOpen(true)}>
-            <MoreVertical size={18} />
-          </button>
-          <div className="revise-area" onClick={() => setIsReviseOpen(true)}>
-            Revise
-          </div>
+          <button className="more-btn" onClick={() => setIsDetailsOpen(true)}><MoreVertical size={18} /></button>
+          <div className="revise-area" onClick={() => setIsReviseOpen(true)}>Revise</div>
         </div>
       </div>
 
-      {/* --- MODAL 1: TOPIC DETAILS --- */}
-      <Modal isOpen={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
-        <div className="topic-modal">
-          <div className="modal-header">
-            <h2 className="modal-title">
-              Topic Name : <span>{name}</span>
-            </h2>
-            <p className="modal-sub">First added at {date}</p>
-          </div>
-
-          <div className="modal-body">
-            <div className="modal-score-box">
-              <span className={`difficulty-strip ${urgency}`} />
-              <div className="score-text">
-                <p>Your Memory Score for this topic is</p>
-                <span className="score-value">{score}%</span>
+      {/* REVISION FLOW MODAL */}
+      <Modal isOpen={isReviseOpen} onClose={closeReviseModal}>
+        <div className="add-flow-container">
+          {reviseStep === 1 ? (
+            <div className="step-content assessment-view">
+              <h2 className="modal-title">Revising: {name}</h2>
+              <div className="question-area">
+                <p className="q-text"><strong>Q{currentQuestion}</strong> Rate your current recall after revision:</p>
+                <input
+                  type="range" min="0" max="100"
+                  value={answers[`q${currentQuestion}`]}
+                  onChange={(e) => setAnswers({...answers, [`q${currentQuestion}`]: parseInt(e.target.value)})}
+                  className="assessment-slider"
+                />
               </div>
-              <div className="score-chart">
-                <div className="pie-placeholder">Pie</div>
+              <div className="assessment-footer">
+                <button className="primary-btn" onClick={() => currentQuestion < 5 ? setCurrentQuestion(c => c+1) : setReviseStep(2)}>Next</button>
               </div>
             </div>
-
-            <div className="modal-info-grid">
-              <div className="info-card">
-                <p className="info-label">Number of Revisions</p>
-                <p className="info-value">{revisions}</p>
-              </div>
-              <div className="info-card">
-                <p className="info-label">Last Revision</p>
-                <p className="info-value">{lastRevision}</p>
-              </div>
-              <div className="info-card full">
-                <p className="info-label">Next Recommended Revision</p>
-                <p className="info-value highlight">{nextRevision}</p>
-              </div>
-
-              <div className="modal-graph-section full">
-                <h3 className="section-subtitle">Memory Graph</h3>
-                <div className="graph-placeholder">
-                  Visualizing {name} ({urgency} urgency)
-                </div>
-              </div>
+          ) : (
+            <div className="step-content complete-view" style={{ textAlign: "center" }}>
+              <h2>Revision Recorded</h2>
+              <button className="primary-btn" onClick={handleFinishRevision}>Sync with Memory</button>
             </div>
-          </div>
+          )}
         </div>
       </Modal>
 
-      {/* --- MODAL 2: REVISE ASSESSMENT FLOW --- */}
-      <Modal isOpen={isReviseOpen} onClose={closeReviseModal}>
-        <div className="add-flow-container">
-          {reviseStep === 1 && (
-            <div className="step-content assessment-view">
-              <div className="assessment-header">
-                <h2 className="modal-title">Revision Assessment</h2>
-                <p className="modal-sub">
-                  Topic : <strong>{name}</strong>
-                </p>
-              </div>
-
-              <div className="question-area">
-                <p className="q-text">
-                  <strong>Q{currentQuestion}</strong> How confident are you with
-                  this topic after your revision session?
-                </p>
-                <div className="slider-wrapper">
-                  <div className="slider-labels">
-                    <span>0</span>
-                    <span className="current-bubble">{newScoreValue}</span>
-                    <span>100</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={newScoreValue}
-                    onChange={(e) => setNewScoreValue(e.target.value)}
-                    className="assessment-slider"
-                  />
-                  <div className="slider-labels">
-                    <small>
-                      Barely
-                      <br />
-                      anything
-                    </small>
-                    <small>
-                      Almost
-                      <br />
-                      everything
-                    </small>
-                  </div>
-                </div>
-              </div>
-
-              <div className="assessment-footer">
-                <p>Question {currentQuestion} of 5</p>
-                <button className="primary-btn" onClick={handleNextQuestion}>
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
-
-          {reviseStep === 2 && (
-            <div
-              className="step-content complete-view"
-              style={{ textAlign: "center" }}
-            >
-              <h2 className="modal-title">Revision Complete</h2>
-              <p className="modal-sub">
-                Topic : <strong>{name}</strong>
-              </p>
-
-              <div className="final-score-area">
-                <p className="score-announcement">
-                  Updated Memory Score: <span>{newScoreValue}%</span>
-                </p>
-                <p className="info-sub">
-                  Your retention data has been updated.
-                </p>
-              </div>
-
-              <div className="progress-circle-mock">{newScoreValue}%</div>
-
-              <button className="primary-btn" onClick={handleFinishRevision}>
-                Update Dashboard
-              </button>
-            </div>
-          )}
+      {/* TOPIC DETAILS MODAL */}
+      <Modal isOpen={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
+        <div className="topic-modal">
+          <h2 className="modal-title">{name} Details</h2>
+          <div className="modal-info-grid">
+            <div className="info-card"><p>Memory Score</p><h3>{memoryScore}%</h3></div>
+            <div className="info-card"><p>Total Revisions</p><h3>{revisionCount}</h3></div>
+            <div className="info-card"><p>Next Recommended</p><h3 className="highlight">{new Date(nextRevisionDate).toLocaleDateString()}</h3></div>
+          </div>
         </div>
       </Modal>
     </>

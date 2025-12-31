@@ -14,7 +14,7 @@ function LoginForm() {
         email,
         password,
       });
-
+     
       localStorage.setItem("token", res.data.token);
       navigate("/dashboard"); // protected route
     } catch (err) {

@@ -12,7 +12,9 @@ const generateToken = (id) => {
 // REGISTER
 exports.register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    console.log("REGISTER BODY:", req.body);
+
+    const { name, email, password } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -23,7 +25,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
-      username,
+      username: name,
       email,
       password: hashedPassword,
     });

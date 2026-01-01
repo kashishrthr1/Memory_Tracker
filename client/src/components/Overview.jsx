@@ -86,7 +86,7 @@
 
 import React, { useEffect, useState } from "react";
 
-const Overview = ({ score = 72, nextTopic, onReviseClick }) => {
+const Overview = ({ score = 42, nextTopic, onReviseClick }) => {
   const [animatedScore, setAnimatedScore] = useState(0);
 
   useEffect(() => {
@@ -96,11 +96,7 @@ const Overview = ({ score = 72, nextTopic, onReviseClick }) => {
   }, [score]);
 
   const chartStyle = {
-    background: `conic-gradient(
-      #4f46e5 0deg, 
-      #818cf8 ${animatedScore * 3.6}deg, 
-      #f1f5f9 ${animatedScore * 3.6}deg 360deg
-    )`,
+    "--progress": animatedScore,
   };
 
   return (
@@ -108,14 +104,19 @@ const Overview = ({ score = 72, nextTopic, onReviseClick }) => {
       <div className="overview-top">
         <div className="overview-text box">
           <div className="welcome-header">
-            {/* <span className="wave">👋</span> */}
-            <h1>Welcome back, Kashish</h1>
+            <h1>Welcome back, Kashish 👋</h1>
           </div>
-          <p className="score-subtext">Your weekly memory score is currently</p>
-          <div className="score-display">
-            <span className="highlight">{score}%</span>
-            <span className="trend-badge">↑ 10% higher</span>
-          </div>
+
+          <p className="welcome-description">
+            You’re making steady progress in strengthening your memory.
+            Consistent revisions over time help lock concepts in and reduce
+            last-minute stress.
+          </p>
+
+          <p className="welcome-description muted">
+            Today is a good day to revisit one pending topic and reinforce what
+            you already know. Small sessions compound into long-term retention.
+          </p>
         </div>
 
         <div className="overview-chart box">
@@ -123,7 +124,15 @@ const Overview = ({ score = 72, nextTopic, onReviseClick }) => {
             <div className="pie-chart" style={chartStyle}>
               <div className="pie-inner">
                 <span className="pie-number">{animatedScore}%</span>
+                <span className="pie-label">Memory Score</span>
               </div>
+            </div>
+
+            <div className="pie-meta">
+              <span className="pie-trend positive">▲ +10% this week</span>
+              <p className="pie-insight">
+                Strong retention — keep revising consistently
+              </p>
             </div>
           </div>
         </div>

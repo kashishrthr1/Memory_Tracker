@@ -203,6 +203,26 @@ body, html {
   text-decoration: none;
 }
 
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.profile-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+
 .box-outline { border: 1px solid #ccc; background: white; color: #333; }
 .box-solid { background: #4f46e5; color: white; }
 

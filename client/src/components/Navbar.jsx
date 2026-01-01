@@ -80,6 +80,20 @@ const Navbar = () => {
   }, []);
 
   const hideAuthButtons = location.pathname === "/dashboard";
+  const isLoggedIn = !!localStorage.getItem("token");
+
+  const handleDashboardClick = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
@@ -97,14 +111,15 @@ const Navbar = () => {
         >
           Home
         </NavLink>
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            isActive ? "nav-btn active" : "nav-btn"
-          }
+        <div
+          className={`nav-btn ${
+            location.pathname === "/dashboard" ? "active" : ""
+          }`}
+          onClick={handleDashboardClick}
         >
           Dashboard
-        </NavLink>
+        </div>
+
         <NavLink
           to="/contact"
           className={({ isActive }) =>
@@ -115,22 +130,28 @@ const Navbar = () => {
         </NavLink>
       </div>
 
-      {!hideAuthButtons && (
-        <div className="nav-actions">
-          <div
-            className="action-box box-outline"
-            onClick={() => navigate("/login")}
-          >
-            Log In
+      <div className="nav-actions">
+        {!isLoggedIn ? (
+          <>
+            <div
+              className="action-box box-outline"
+              onClick={() => navigate("/login")}
+            >
+              Log In
+            </div>
+            <div
+              className="action-box box-solid"
+              onClick={() => navigate("/register")}
+            >
+              Get Started
+            </div>
+          </>
+        ) : (
+          <div className="profile-icon" onClick={handleLogout}>
+            <img src="/profile.svg" alt="profile" />
           </div>
-          <div
-            className="action-box box-solid"
-            onClick={() => navigate("/register")}
-          >
-            Get Started
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </nav>
   );
 };

@@ -308,6 +308,36 @@ const TopicList = () => {
 
   const token = localStorage.getItem("token");
 
+  const DUMMY_TOPICS = [
+    {
+      _id: "1",
+      name: "Photosynthesis",
+      memoryScore: 72,
+      revisionCount: 3,
+      createdAt: "2025-03-01",
+      lastRevisedAt: "2025-03-20",
+      nextRevisionDate: "2025-03-25",
+    },
+    {
+      _id: "2",
+      name: "Binary Trees",
+      memoryScore: 88,
+      revisionCount: 1,
+      createdAt: "2025-02-15",
+      lastRevisedAt: "2025-03-10",
+      nextRevisionDate: "2025-03-28",
+    },
+    {
+      _id: "3",
+      name: "Operating Systems",
+      memoryScore: 54,
+      revisionCount: 5,
+      createdAt: "2025-01-20",
+      lastRevisedAt: "2025-03-18",
+      nextRevisionDate: "2025-03-22",
+    },
+  ];
+
   /* ---------------- FETCH TOPICS ---------------- */
   const fetchTopics = async () => {
     try {
@@ -320,14 +350,18 @@ const TopicList = () => {
       if (!res.ok) throw new Error("Failed to fetch topics");
 
       const data = await res.json();
-      setTopics(data);
+      setTopics(data.length ? data : DUMMY_TOPICS);
     } catch (err) {
       console.error("Fetch topics error:", err);
     }
   };
 
+  // useEffect(() => {
+  //   fetchTopics();
+  // }, []);
+
   useEffect(() => {
-    fetchTopics();
+    setTopics(DUMMY_TOPICS);
   }, []);
 
   /* ---------------- ADD TOPIC ---------------- */

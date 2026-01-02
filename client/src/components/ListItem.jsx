@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { MoreVertical } from "lucide-react";
+import MemoryGraph from "./MemoryGraph";
+
 import Modal from "./Modal";
 
 const ListItem = ({
@@ -21,6 +23,19 @@ const ListItem = ({
     q4: score,
     q5: score,
   });
+
+  // const graphData = data.map((item) => ({
+  //   score: item.memoryScore,
+  //   date: new Date(item.date).toLocaleDateString("en-GB", {
+  //     day: "numeric",
+  //     month: "short",
+  //   }),
+  // }));
+  const graphData = [
+    { score: 80, date: "12 Mar" },
+    { score: 75, date: "15 Mar" },
+    { score: 82, date: "18 Mar" },
+  ];
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isReviseOpen, setIsReviseOpen] = useState(false);
@@ -133,9 +148,7 @@ const ListItem = ({
 
               <div className="modal-graph-section full">
                 <h3 className="section-subtitle">Memory Graph</h3>
-                <div className="graph-placeholder">
-                  Visualizing {name} ({urgency} urgency)
-                </div>
+                <MemoryGraph data={graphData} />
               </div>
             </div>
           </div>

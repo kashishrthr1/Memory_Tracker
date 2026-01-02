@@ -491,6 +491,13 @@
   }
   
   /* 3 dots button */
+  .memory-graph {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 12px;
+  }
+  
   .more-btn {
     background: transparent;
     border: none;

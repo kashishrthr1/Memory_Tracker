@@ -1,52 +1,185 @@
-// import "..styles/dashboard.css";
+// import React, { useEffect, useState } from "react";
 
-const Overview = ({ score = 72 }) => {
+// const Overview = ({ score = 72, nextTopic, onReviseClick }) => {
+//   const [animatedScore, setAnimatedScore] = useState(0);
+
+//   // Trigger animation on mount
+//   useEffect(() => {
+//     const timeout = setTimeout(() => {
+//       setAnimatedScore(score);
+//     }, 100);
+//     return () => clearTimeout(timeout);
+//   }, [score]);
+
+//   // Dynamic style for the conic gradient
+//   const chartStyle = {
+//     background: `conic-gradient(
+//       #6366f1 0deg ${animatedScore * 3.6}deg,
+//       #e2e8f0 ${animatedScore * 3.6}deg 360deg
+//     )`,
+//   };
+
+//   return (
+//     <section className="overview">
+//       <div className="overview-top">
+//         <div className="overview-text box">
+//           <h1>Welcome back, Kashish</h1>
+//           <p className="score-text">
+//             Your weekly memory score is{" "}
+//             <span className="highlight">{score}%</span>
+//           </p>
+//           <p className="score-subtext">That’s 10% higher than last week</p>
+//         </div>
+
+//         <div className="overview-chart box">
+//           <div className="pie-container">
+//             <div className="pie-chart" style={chartStyle}>
+//               <div className="pie-inner">
+//                 <span className="pie-number">{animatedScore}%</span>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div className="overview-bottom">
+//         <div className="box graph-box">
+//           <div className="placeholder-content">
+//             <p className="label">Memory Activity</p>
+//             <div className="line-placeholder">Line graph visualization</div>
+//           </div>
+//         </div>
+
+//         <div className="box revision-box">
+//           <div className="revision-info">
+//             <p>
+//               <span className="label">Next Revision:</span>
+//               <span className="highlight2">
+//                 {nextTopic ? nextTopic.name : "None Pending"}
+//               </span>
+//             </p>
+//             <p>
+//               <span className="label">Date:</span>
+//               <span className="highlight2">
+//                 {nextTopic ? nextTopic.nextRevision : "--"}
+//               </span>
+//             </p>
+//           </div>
+
+//           <div className="revision-action">
+//             <p className="revise-question">Ready to improve your score?</p>
+//             <button
+//               className="btn-primary revise-btn"
+//               onClick={onReviseClick}
+//               disabled={!nextTopic}
+//             >
+//               Revise Now
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default Overview;
+
+import React, { useEffect, useState } from "react";
+
+const Overview = ({ score = 42, nextTopic, onReviseClick }) => {
+  const [animatedScore, setAnimatedScore] = useState(0);
+
+  useEffect(() => {
+    // Small delay to ensure the transition is visible after component mount
+    const timer = setTimeout(() => setAnimatedScore(score), 200);
+    return () => clearTimeout(timer);
+  }, [score]);
+
+  const chartStyle = {
+    "--progress": animatedScore,
+  };
+
   return (
     <section className="overview">
-      {/* Top 2:1 grid */}
       <div className="overview-top">
-        {/* Left (2fr) */}
         <div className="overview-text box">
-          <h1>Welcome back, Kashish</h1>
-          <p className="score-text">
-            Your weekly memory score is{" "}
-            <span className="highlight">{score}%</span>
+          <div className="welcome-header">
+            <h1>Welcome back, Kashish 👋</h1>
+          </div>
+
+          <p className="welcome-description">
+            You’re making steady progress in strengthening your memory.
+            Consistent revisions over time help lock concepts in and reduce
+            last-minute stress.
           </p>
-          <p className="score-subtext">That’s 10% higher then last week </p>
+
+          <p className="welcome-description muted">
+            Today is a good day to revisit one pending topic and reinforce what
+            you already know. Small sessions compound into long-term retention.
+          </p>
         </div>
 
-        {/* Right (1fr) */}
         <div className="overview-chart box">
-          {/* Placeholder for pie chart */}
-          <div className="pie-placeholder">{score}%</div>
+          <div className="pie-container">
+            <div className="pie-chart" style={chartStyle}>
+              <div className="pie-inner">
+                <span className="pie-number">{animatedScore}%</span>
+                <span className="pie-label">Memory Score</span>
+              </div>
+            </div>
+
+            <div className="pie-meta">
+              <span className="pie-trend positive">▲ +10% this week</span>
+              <p className="pie-insight">
+                Strong retention — keep revising consistently
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Bottom 1:1 grid */}
       <div className="overview-bottom">
-        {/* Left */}
-        <div className="box">
-          <div className="line-placeholder">Line graph placeholder</div>
+        <div className="box graph-box">
+          <div className="box-header">
+            <p className="label">Memory Activity</p>
+            <span className="sub-label">Last 7 days</span>
+          </div>
+          <div className="line-placeholder">
+            {/* Replace with a chart library like Recharts later */}
+            <p>Activity visualization</p>
+          </div>
         </div>
 
-        {/* Right */}
         <div className="box revision-box">
-          {/* <br /> */}
-          <p>
-            <span className="label">Next Revision : </span>{" "}
-            <span className="highlight2">Topic Name</span>
-          </p>
+          <div className="box-header">
+            <p className="label">Next Milestone</p>
+          </div>
 
-          <p>
-            <span className="label">Date : </span>{" "}
-            <span className="highlight2">Revision Date</span>
-          </p>
+          <div className="revision-details">
+            <div className="detail-item">
+              <span className="detail-label">TOPIC</span>
+              <span className="detail-value">
+                {nextTopic ? nextTopic.name : "Relax, you're caught up!"}
+              </span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">DUE DATE</span>
+              <span className="detail-value">
+                {nextTopic ? nextTopic.nextRevision : "No tasks pending"}
+              </span>
+            </div>
+          </div>
 
-          <p className="revise-question">Revise now?</p>
-
-          <p>
-            <button className="btn-primary revise-btn">Revise</button>
-          </p>
+          <div className="revision-action">
+            <button
+              className="btn-primary revise-btn"
+              onClick={onReviseClick}
+              disabled={!nextTopic}
+            >
+              Start Revision Session
+            </button>
+            <p className="revise-question">Boost your score by 5% today</p>
+          </div>
         </div>
       </div>
     </section>

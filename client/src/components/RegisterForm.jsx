@@ -1,100 +1,115 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../api/axios"; // Humara centralized Axios instance
 import InputField from "./InputField";
 import "../styles/login.css";
-import React, { useState } from 'react';
-import axios from 'axios';
 
 function RegisterForm() {
   const navigate = useNavigate();
 
-  // State to store input values
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
-  const [message, setMessage] = useState(""); // success/error message
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Handle input changes
+  // Handle input changes dynamically
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle form submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleRegister = async (e) => {
+    if (e) e.preventDefault(); // Form submit prevent karne ke liye
 
-    // Basic password match check
-    if (formData.password !== formData.confirmPassword) {
-      setMessage("Passwords do not match");
-      return;
+    // Basic password validation
+    if (form.password !== form.confirmPassword) {
+      return setError("Passwords do not match");
     }
 
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/register", // backend URL
-        {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password
-        }
-      );
+    setLoading(true);
+    setError("");
 
-      setMessage(res.data.message);
+    try {
+      await API.post("/auth/register", {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+      });
       
-      navigate("/login"); // redirect to login after successful registration
+      // Registration ke baad seedha login par bhej dein
+      navigate("/login");
     } catch (err) {
-      setMessage(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.message || "Registration failed. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="register-form">
-      <form onSubmit={handleSubmit}>
-        <InputField 
-          label="Name" 
-          type="text" 
+    <div className="auth-form-container">
+      <h2 className="form-title">Create Account</h2>
+      <p className="form-subtitle">Join us to start mastering your memory today.</p>
+
+      <form className="register-form" onSubmit={handleRegister}>
+        <InputField
+          label="Full Name"
           name="name"
-          value={formData.name}
-          onChange={handleChange} 
-        />
-        <InputField 
-          label="Email" 
-          type="email" 
-          name="email"
-          value={formData.email}
-          onChange={handleChange} 
-        />
-        <InputField 
-          label="Password" 
-          type="password" 
-          name="password"
-          value={formData.password}
-          onChange={handleChange} 
-        />
-        <InputField 
-          label="Confirm Password" 
-          type="password" 
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange} 
+          type="text"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="John Doe"
         />
 
-        <div className="flex-center lmargin">
-          <button className="login-btn" type="submit">Register</button>
+        <InputField
+          label="Email Address"
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+          placeholder="name@company.com"
+        />
+
+        <InputField
+          label="Password"
+          type="password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          placeholder="••••••••"
+        />
+
+        <InputField
+          label="Confirm Password"
+          type="password"
+          name="confirmPassword"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          placeholder="••••••••"
+        />
+
+        {error && <p className="error-text" style={{ color: "red", fontSize: "0.85rem" }}>{error}</p>}
+
+        <div className="flex-center">
+          <button
+            className="auth-btn"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Creating Account..." : "Register"}
+          </button>
+
+          <div className="auth-switch">
+            <p>Already a user?</p>
+            <span className="link-action" onClick={() => navigate("/login")}>
+              Log in
+            </span>
+          </div>
         </div>
       </form>
-
-      {message && <p style={{color: "red", marginTop: "10px"}}>{message}</p>}
-
-      <div className="links m-top flex-row">
-        <p>Already a user?</p>
-        <span className="link-action" onClick={() => navigate("/login")}>
-          Log in
-        </span>
-      </div>
     </div>
   );
 }

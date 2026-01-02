@@ -4,9 +4,9 @@ function InputField({ label, type, name, value, onChange }) {
       <label>{label}</label>
       <input
         type={type}
-        name={name}          // 🔥 important
-        value={value}        // 🔥 important
-        onChange={onChange}  // 🔥 important
+        name={name}      // Multiple inputs handle karne ke liye zaroori hai
+        value={value}
+        onChange={onChange}
         required
       />
     </div>

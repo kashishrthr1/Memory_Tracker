@@ -6,3 +6,5 @@ export const createTopic = (topicData) => api.post("/topics", topicData);
 
 export const reviseTopic = (id, assessmentData) => 
   api.post(`/topics/${id}/revise`, assessmentData);
+
+export const getRevisionCalendar = () => api.get("/topics/revision-calendar");

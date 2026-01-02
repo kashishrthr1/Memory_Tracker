@@ -175,7 +175,7 @@
   /* Labels row */
   .topic-labels {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 0.6fr 1fr 0.9fr;
     padding: 0.75rem 1rem;
     font-weight: 600;
     color: #374151;
@@ -823,6 +823,7 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 2rem;
+  
 }
 
 /* Buttons */
@@ -830,10 +831,10 @@
   background: #5850ec;
   color: #fff;
   border: none;
-  padding: 1rem 2.5rem;
+  padding: 0.8rem 2rem;
   font-size: 1.2rem;
   font-weight: 700;
-  border-radius: 14px;
+  border-radius: 12px;
   cursor: pointer;
 }
 

@@ -4,15 +4,14 @@ const topicSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true },
-
     memoryScore: { type: Number, required: true },
     lastRevisedAt: { type: Date, required: true },
     lastDecayAt: { type: Date, required: true }, 
     nextRevisionDate: { type: Date, required: true },
-
-    revisionCount: { type: Number, default: 0 }
+    revisionCount: { type: Number, default: 1 } // Set to 1 as we discussed
   },
   { timestamps: true }
 );
 
+// THIS IS THE CRITICAL LINE:
 module.exports = mongoose.model("Topic", topicSchema);

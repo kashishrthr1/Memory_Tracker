@@ -5,47 +5,41 @@ const { applyDecay } = require("../utils/memoryScore");
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
+const getNormalizedDate = () => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+};
+
 cron.schedule("0 0 * * *", async () => {
-  console.log("🕛 Running daily memory decay cron");
+    console.log("🕛 Running daily memory decay cron");
+    const today = getNormalizedDate(); // Always use 00:00:00
 
-   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+    const topics = await Topic.find();
 
+    for (const topic of topics) {
+        const daysPassed = Math.floor((Date.now() - topic.lastDecayAt) / ONE_DAY);
 
-  const topics = await Topic.find();
+        // Agar aaj hi revise hua hai (daysPassed 0), toh skip decay
+        if (daysPassed <= 0) continue;
 
-  for (const topic of topics) {
-    const daysPassed = Math.floor(
-      (Date.now() - topic.lastDecayAt) / ONE_DAY
-    );
+        const newScore = applyDecay(topic.memoryScore, daysPassed);
 
-    if (daysPassed <= 0) continue;
+        // Update topic
+        topic.memoryScore = newScore;
+        topic.lastDecayAt = new Date();
+        topic.nextRevisionDate = (newScore === 0 || topic.nextRevisionDate < today) 
+            ? today 
+            : calculateNextRevisionDate(newScore);
+        
+        await topic.save();
 
-    const newScore = applyDecay(topic.memoryScore, daysPassed);
-
-    // Save history for graph
-    await MemoryHistory.create({
-      user: topic.user,
-      topic: topic._id,
-      memoryScore: newScore,
-      date: new Date()
-    });
-
-    topic.memoryScore = newScore;
-    topic.lastDecayAt = new Date();
-    if (
-      newScore === 0 ||
-      topic.nextRevisionDate < today
-    ) {
-      // Force revision today
-      topic.nextRevisionDate = today;
-    } 
-    else {
-     topic.nextRevisionDate = calculateNextRevisionDate(newScore);
+        // Update History point for the graph
+        await MemoryHistory.findOneAndUpdate(
+            { user: topic.user, topic: topic._id, date: today },
+            { memoryScore: newScore },
+            { upsert: true }
+        );
     }
-
-    await topic.save();
-  }
-
-  console.log("✅ Memory decay applied");
+    console.log("✅ Memory decay applied and history updated");
 });

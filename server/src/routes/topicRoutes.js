@@ -6,12 +6,14 @@ const { createTopicWithAssessment,getUserTopics } = require("../controllers/topi
 const { reviseTopic } = require("../controllers/topicController");
 const { getRevisionCalendar } = require("../controllers/calendarController");
 const { getMemoryGraph } = require("../controllers/memoryController");
+const {getWeeklyAverageMemoryScore}=require("../controllers/weeklyAverageController");
 
 router.post("/", protect, createTopicWithAssessment);
 router.post("/:id/revise", protect, reviseTopic);
 router.get("/revision-calendar", protect, getRevisionCalendar);
 router.get("/", protect, getUserTopics);
 router.get("/graph/:topicId", protect, getMemoryGraph);
+router.get("/weekly-average",protect,getWeeklyAverageMemoryScore);
 
 module.exports = router;
 

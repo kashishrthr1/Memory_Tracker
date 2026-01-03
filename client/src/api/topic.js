@@ -8,3 +8,4 @@ export const reviseTopic = (id, assessmentData) =>
   api.post(`/topics/${id}/revise`, assessmentData);
 
 export const getRevisionCalendar = () => api.get("/topics/revision-calendar");
+export const getWeeklyAverageMemoryScore=()=>api.get("/memory/weekly-average");

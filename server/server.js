@@ -1,9 +1,7 @@
+require("dotenv").config();
 const app = require("./src/app");
 const connectDB = require("./src/config/db");
-require("dotenv").config();
-require("./src/cron/memoryDecayCron");
-
-
+// Cron job removed - decay is now calculated at read time instead of daily updates
 
 connectDB();
 

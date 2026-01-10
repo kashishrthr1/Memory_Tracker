@@ -34,44 +34,98 @@ import Footer from "../components/Footer";
 import "../styles/dashboard.css";
 
 // 1. Function import bilkul sahi hai
-import { getWeeklyAverageMemoryScore } from "../api/topic"; 
+import { getWeeklyAverageMemoryScore,fetchTopics,getRecentActivities} from "../api/topic";
 
 const DashboardPage = () => {
   const [weeklyScore, setWeeklyScore] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        // 2. Fix: Yahan 'api.get' ki jagah imported function use karein
-        const response = await getWeeklyAverageMemoryScore();
-        
-        // 3. Backend se data set karein
-        setWeeklyScore(response.data.averageMemoryScore);
-      } catch (err) {
-        console.error("Failed to fetch dashboard stats:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [userName, setUserName] = useState("");
+  const [topics, setTopics] = useState([]); // Add state for topics
 
-    fetchStats();
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    // 1. LocalStorage se user nikalna aur correct key (username) use karna
+    const storedUserStr = localStorage.getItem("user");
+
+    if (storedUserStr && storedUserStr !== "undefined") {
+      try {
+        const storedUser = JSON.parse(storedUserStr);
+
+        // Aapke backend response ke mutabik key 'username' hai
+        const displayName = storedUser?.username || storedUser?.name || "Student";
+
+        // Split tabhi karein jab naam maujood ho
+        setUserName(displayName.split(" ")[0]);
+      } catch (err) {
+        console.error("User parsing error:", err);
+        setUserName("Student");
+      }
+    }
   }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      // 1. Fetch Weekly Stats
+      const statsRes = await getWeeklyAverageMemoryScore();
+      setWeeklyScore(statsRes.data.averageWeeklyMemoryScore);
+
+      // 2. Fetch Topics for the Milestone logic
+      // Assuming you have a fetchTopics API function
+      const topicsRes = await fetchTopics(); 
+      setTopics(topicsRes.data);
+
+      const activityRes=await getRecentActivities();
+      setActivities(activityRes.data);
+
+    } catch (err) {
+      console.error("Dashboard data fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+    // Listen for events to refresh data
+    window.addEventListener("refreshDashboardData", fetchDashboardData);
+    return () => window.removeEventListener("refreshDashboardData", fetchDashboardData);
+  }, []);
+
+  // 3. Logic to find the Next Milestone Topic
+  // We sort by currentScore (lowest first) to find the most urgent topic
+  const sortedTopics = [...topics].sort((a, b) => (a.currentScore || 0) - (b.currentScore || 0));
+  const topTopic = sortedTopics[0];
+
+  const nextTopicData = topTopic ? {
+    name: topTopic.topicName,
+    nextRevision: topTopic.optimalRevisionDate 
+      ? new Date(topTopic.optimalRevisionDate).toLocaleDateString('en-GB') 
+      : "Pending",
+    id: topTopic._id
+  } : null;
 
   return (
     <div className="app-container">
       <Navbar />
       <main className="dashboard-container">
-        {/* Jab tak loading hai, score 0 rahega phir animate hoga */}
-        <Overview score={loading ? 0 : weeklyScore} />
+        {/* Pass nextTopicData to Overview */}
+        <Overview 
+          score={loading ? 0 : weeklyScore} 
+          userName={userName} 
+          nextTopic={nextTopicData}
+        />
+
+        {/* Pass topics and refresh function to TopicList so it doesn't fetch independently */}
+        <TopicList topics={topics} onRefresh={fetchDashboardData} />
         
-        <TopicList />
         <RevisionGuide />
-        <RecentActivity />
+        <RecentActivity activities={activities}/>
       </main>
       <Footer />
     </div>
   );
 };
 
-export default DashboardPage;
+  export default DashboardPage;

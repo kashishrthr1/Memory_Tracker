@@ -1,17 +1,23 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const topicSchema = new mongoose.Schema(
-  {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    name: { type: String, required: true },
-    memoryScore: { type: Number, required: true },
-    lastRevisedAt: { type: Date, required: true },
-    lastDecayAt: { type: Date, required: true }, 
-    nextRevisionDate: { type: Date, required: true },
-    revisionCount: { type: Number, default: 1 } // Set to 1 as we discussed
-  },
-  { timestamps: true }
-);
+const revisionSchema = new mongoose.Schema({
+  date: { type: Date, default: Date.now },
+  scoreBeforeRevision: Number,
+  scoreAfterRevision: Number,
+  daysSinceLastRevision: Number
+});
 
-// THIS IS THE CRITICAL LINE:
-module.exports = mongoose.model("Topic", topicSchema);
+const TopicSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  topicName: { type: String, required: true },
+
+  baseMemoryScore: { type: Number, required: true, min: 0, max: 100 },
+  stability: { type: Number, required: true },      // days
+  difficulty: { type: Number, required: true, min: 0, max: 1 },
+  revisionCount: { type: Number, default: 0 },
+
+  lastRevisedAt: { type: Date, default: Date.now },
+  revisionHistory: [revisionSchema]
+}, { timestamps: true });
+
+module.exports = mongoose.model('Topic', TopicSchema);

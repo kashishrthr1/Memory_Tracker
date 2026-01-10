@@ -1,107 +1,244 @@
-const Topic = require("../models/Topic");
-const MemoryHistory=require("../models/MemoryHistory")
-const {
-  calculateAssessmentScore,
-  calculateNextRevisionDate
-} = require("../utils/memoryScore");
+const Topic = require('../models/Topic');
+const { analyzeAssessment, calculateStability } = require('../services/assessment.service');
+const { calculateCurrentScore, calculateOptimalDate,calculateScoreAtDate } = require('../services/memory.service');
+const { getFiveDayCalendar } = require('../services/calendar.service');
+const { getWeeklyAverageScore } = require('../services/analytics.service');
+const Activity = require('../models/Activity');
 
 
-const getNormalizedDate = () => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-};
-
-exports.createTopicWithAssessment = async (req, res) => {
-    try {
-        const { name, q1, q2, q3, q4, q5 } = req.body;
-        const historyDate = getNormalizedDate();
-
-        if (!name) return res.status(400).json({ message: "Topic name required" });
-        if ([q1, q2, q3, q4, q5].some(v => v === undefined)) {
-            return res.status(400).json({ message: "Assessment is mandatory" });
-        }
-
-        const memoryScore = calculateAssessmentScore({ q1, q2, q3, q4, q5 });
-        const nextRevisionDate = calculateNextRevisionDate(memoryScore);
-
-        const topic = await Topic.create({
-            user: req.user._id,
-            name,
-            memoryScore,
-            lastRevisedAt: new Date(),
-            lastDecayAt: new Date(),
-            nextRevisionDate,
-            revisionCount: 1
-        });
-
-        // Use findOneAndUpdate here too! 
-        // Takki agar user ne same day pehle delete karke fir banaya ho toh duplication na ho
-        await MemoryHistory.findOneAndUpdate(
-            { user: req.user._id, topic: topic._id, date: historyDate },
-            { memoryScore: memoryScore },
-            { upsert: true, new: true }
-        );
-
-        res.status(201).json({ message: "Topic created successfully", topic });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
-
-exports.getUserTopics = async (req, res) => {
+// Create a new topic
+exports.createTopic = async (req, res) => {
   try {
-    // req.user._id is populated by your protect middleware
-    const topics = await Topic.find({ user: req.user._id })
-      .sort({ memoryScore: 1 }); // Sort by lowest score first for revision priority
+    const { topicName, assessmentResponses } = req.body;
 
-    res.status(200).json(topics);
+    const { averageScore, difficulty } = analyzeAssessment(assessmentResponses);
+    const stability = calculateStability({ difficulty, revisionCount: 0, averageScore });
+
+    const now = new Date();
+    const topic = new Topic({
+      userId: req.user.id,
+      topicName,
+      baseMemoryScore: averageScore,
+      stability,
+      difficulty,
+      revisionCount: 0,
+      lastRevisedAt: now,
+      revisionHistory: [{
+        date: now,
+        scoreBeforeRevision: null,
+        scoreAfterRevision: averageScore,
+        daysSinceLastRevision: 0
+      }]
+    });
+
+    await topic.save();
+    await Activity.create({
+      userId: req.user.id,
+      topicName: topicName,
+      activityType: 'added'
+    });
+    res.status(201).json({
+      ...topic.toObject(),
+      currentScore: Math.round(averageScore),
+      optimalRevisionDate: calculateOptimalDate(topic)
+    });
   } catch (err) {
-    res.status(500).json({ message: "Error fetching topics", error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
+// Get all topics for user, with currentScore & optimalRevisionDate
+exports.getTopics = async (req, res) => {
+  try {
+    const topics = await Topic.find({ userId: req.user.id });
+
+    const now = new Date();
+    const results = topics.map(topic => {
+      const currentScore = calculateCurrentScore(topic, now);
+      const optimalDate = calculateOptimalDate(topic);
+
+      return {
+        ...topic.toObject(),
+        currentScore: Math.round(currentScore),
+        optimalRevisionDate: optimalDate,
+        status:
+          currentScore >= 70 ? 'healthy' :
+            currentScore >= 60 ? 'review-soon' :
+              'urgent'
+      };
+    });
+
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Revise a topic
 exports.reviseTopic = async (req, res) => {
-    try {
-        const { q1, q2, q3, q4, q5 } = req.body;
-        const historyDate = getNormalizedDate();
+  try {
+    const { assessmentResponses } = req.body;
+    const topic = await Topic.findById(req.params.id);
 
-        if ([q1, q2, q3, q4, q5].some(v => v === undefined)) {
-            return res.status(400).json({ message: "All assessment answers required" });
-        }
+    if (!topic) return res.status(404).json({ error: 'Topic not found' });
 
-        const topic = await Topic.findOne({ _id: req.params.id, user: req.user._id });
-        if (!topic) return res.status(404).json({ message: "Topic not found" });
+    const now = new Date();
+    const scoreBefore = calculateCurrentScore(topic, now);
+    const { averageScore, difficulty: newDiff } = analyzeAssessment(assessmentResponses);
 
-        // 1️⃣ Apply decay
-        const daysPassed = Math.floor((Date.now() - topic.lastRevisedAt) / (1000 * 60 * 60 * 24));
-        let decayedScore = topic.memoryScore;
-        if (daysPassed > 0) {
-            let decayRate = decayedScore >= 80 ? 1 : decayedScore >= 60 ? 2 : decayedScore >= 40 ? 3 : 4;
-            decayedScore = Math.max(0, decayedScore - daysPassed * decayRate);
-        }
+    const blendedDiff = (topic.difficulty * 0.5) + (newDiff * 0.5);
+    const newStability = calculateStability({
+      difficulty: blendedDiff,
+      revisionCount: topic.revisionCount + 1,
+      averageScore
+    });
 
-        // 2️⃣ New score & Blend
-        const newScore = calculateAssessmentScore({ q1, q2, q3, q4, q5 });
-        const updatedScore = Math.round(0.6 * newScore + 0.4 * decayedScore);
+    const daysSince = (now - topic.lastRevisedAt) / (1000 * 60 * 60 * 24);
 
-        // 3️⃣ Update topic
-        topic.memoryScore = updatedScore;
-        topic.lastRevisedAt = new Date();
-        topic.lastDecayAt = new Date();
-        topic.nextRevisionDate = calculateNextRevisionDate(updatedScore);
-        topic.revisionCount += 1;
-        await topic.save();
+    topic.baseMemoryScore = averageScore;
+    topic.stability = newStability;
+    topic.difficulty = blendedDiff;
+    topic.revisionCount += 1;
+    topic.lastRevisedAt = now;
 
-        // 4️⃣ Update/Upsert History
-        await MemoryHistory.findOneAndUpdate(
-            { user: req.user._id, topic: topic._id, date: historyDate },
-            { memoryScore: updatedScore },
-            { upsert: true, new: true }
-        );
+    topic.revisionHistory.push({
+      date: now,
+      scoreBeforeRevision: Math.round(scoreBefore),
+      scoreAfterRevision: averageScore,
+      daysSinceLastRevision: daysSince
+    });
 
-        res.status(200).json(topic);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+    const optimalDate = calculateOptimalDate(topic);
+    console.log('📅 Optimal Date for', topic.topicName, ':', optimalDate.toISOString());
+
+    const pointsDifference = Math.round(averageScore- scoreBefore);
+
+let displayScore;
+if (pointsDifference > 0) {
+    displayScore = `+${pointsDifference}%`; // Standard gain
+} else if (pointsDifference < 0) {
+    displayScore = `${pointsDifference}%`; // Will show as "-5%"
+} else {
+    displayScore = "0%"; // No change
+}
+
+    await Activity.create({
+      userId: req.user.id,
+      topicName: topic.topicName,
+      activityType: 'revised',
+      scoreChange: displayScore
+    });
+
+    await topic.save();
+
+    res.json({
+      message: 'Revision saved! 🎉',
+      improvementScore: Math.round(averageScore - scoreBefore),
+      ...topic.toObject(),
+      currentScore: Math.round(averageScore),
+      optimalRevisionDate: optimalDate
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+exports.getFiveDayRevision = async (req, res) => {
+  try {
+    const topics = await Topic.find({ userId: req.user.id });
+    const calendar = getFiveDayCalendar(topics);
+    res.json(calendar);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const topics = await Topic.find({ userId: req.user.id });
+
+    const weeklyAverage = getWeeklyAverageScore(topics);
+
+    res.json({
+      averageWeeklyMemoryScore: weeklyAverage
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+exports.getRecentActivities = async (req, res) => {
+  try {
+    // 1. Fetch activities linked to the user ID from the 'protect' middleware
+    const activities = await Activity.find({ userId: req.user.id })
+      .sort({ createdAt: -1 }) // 2. Newest first (Descending)
+      .limit(5);             // 3. Limit to 10 for dashboard performance
+
+    res.status(200).json(activities);
+  } catch (err) {
+    res.status(500).json({ 
+      success: false, 
+      message: "Failed to fetch activities", 
+      error: err.message 
+    });
+  }
+};
+
+exports.getTopicHistory = async (req, res) => {
+  try {
+    const topic = await Topic.findById(req.params.id);
+    if (!topic) return res.status(404).json({ error: "Topic not found" });
+
+    const history = [];
+    const now = new Date();
+    const lookbackDays = 7; // Aap isse 10 ya 14 bhi kar sakte hain
+
+    for (let i = lookbackDays; i >= 0; i--) {
+      const targetDate = new Date();
+      targetDate.setDate(now.getDate() - i);
+      
+      // Din ke aakhir ka score nikalne ke liye time set karein
+      targetDate.setHours(23, 59, 59, 999);
+
+      // Agar targetDate topic ke banne se pehle ki hai, toh use skip karein
+      if (targetDate < new Date(topic.createdAt)) continue;
+
+      // Aapka existing function yahan use hoga
+      const score = calculateScoreAtDate(topic, targetDate);
+
+      history.push({
+        memoryScore: Math.round(score),
+        date: targetDate.toISOString(), // Frontend friendly format
+      });
     }
+
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deleteTopic = async (req, res) => {
+  try {
+    const topic = await Topic.findById(req.params.id);
+
+    if (!topic) {
+      return res.status(404).json({ error: "Topic not found" });
+    }
+
+    // Security: Ensure the user owns this topic
+    // deleteTopic controller mein change karein:
+       if (topic.userId.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ error: "User not authorized" });
+    }
+
+    // 1. Delete all activity logs related to this topic (Optional but recommended)
+    await Activity.deleteMany({ topicName: topic.topicName, userId: req.user.id });
+
+    // 2. Delete the topic
+    await topic.deleteOne();
+
+    res.json({ message: "Topic and associated activities deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };

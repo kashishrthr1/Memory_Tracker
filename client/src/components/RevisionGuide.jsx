@@ -31,19 +31,29 @@ const RevisionGuide = () => {
   }, [loadCalendar]); // Dependency mein loadCalendar daalein
 
   // getDayLabel helper
-  const getDayLabel = (dateStr, index) => {
-    if (index === 0) return "Today";
-    if (index === 1) return "Tomorrow";
-    return new Date(dateStr).toLocaleDateString("en-US", { weekday: "long" });
-  };
+  const getDayLabel = (dateStr) => {
+  // Local dates calculate karein compare karne ke liye
+  const today = new Date().toLocaleDateString('en-CA'); // "YYYY-MM-DD"
+  
+  const tomorrowDate = new Date();
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+  const tomorrow = tomorrowDate.toLocaleDateString('en-CA');
+
+  // Comparison logic based on actual date strings, not index
+  if (dateStr === today) return "Today";
+  if (dateStr === tomorrow) return "Tomorrow";
+  
+  // Baaki dino ke liye Day Name (e.g., Friday)
+  return new Date(dateStr).toLocaleDateString("en-US", { weekday: "long" });
+};
 
   return (
     <section className="revision-guide box">
       <h2 className="section-title">Revision Guide</h2>
       <div className="revision-cards">
         {Object.entries(calendarData).map(([dateKey, topics], index) => (
-          <div key={dateKey} className={`revision-card ${index === 0 ? "today-card" : ""}`}>
-            <div className="revision-card-header">{getDayLabel(dateKey, index)}</div>
+          <div key={dateKey} className={`revision-card ${getDayLabel(dateKey) === "Today" ? "today-card" : ""}`}>
+            <div className="revision-card-header">{getDayLabel(dateKey)}</div>
             <div className="revision-card-body">
               {topics.length === 0 ? (
                 <p className="no-topics">No revisions</p>

@@ -80,7 +80,7 @@ body, html {
   width: 64px;
   border-radius: 20px;
 
-  background: linear-gradient(145deg, #ffffff, #f5f5f5);
+  background: white;
   border: 1px solid rgba(0, 0, 0, 0.06);
 
   display: flex;
@@ -204,17 +204,21 @@ body, html {
 }
 
 .profile-icon {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   cursor: pointer;
+  
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: white;
+
+  /* background: rgba(235, 235, 235, 0.6); */
+  /* border: 2px solid #4F46E5; */
 }
 
 .profile-icon img {

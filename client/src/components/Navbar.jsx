@@ -87,50 +87,58 @@ const Navbar = () => {
         ) : (
           /* Profile Wrapper - Keeping original UI but adding dropdown logic */
           <div className="profile-wrapper" style={{ position: "relative" }}>
-            <div 
-              className="profile-icon" 
+            <div
+              className="profile-icon"
               onClick={() => setShowDropdown(!showDropdown)}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              style={{
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              <CircleUserRound size={32} color="#666" />
+              <CircleUserRound size={32} color="#4F46E5" />
             </div>
 
             {/* Logout Dropdown - Inline styles to avoid CSS conflicts */}
             {showDropdown && (
-              <div 
-                className="logout-dropdown" 
+              <div
+                className="logout-dropdown"
                 style={{
-                  position: 'absolute',
+                  position: "absolute",
                   right: 0,
-                  top: '100%',
-                  marginTop: '12px',
-                  backgroundColor: 'white',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-                  borderRadius: '8px',
-                  padding: '8px',
+                  top: "100%",
+                  marginTop: "12px",
+                  backgroundColor: "white",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+                  borderRadius: "25px",
+                  padding: "0px",
                   zIndex: 1000,
-                  minWidth: '130px',
-                  border: '1px solid #eee'
+                  minWidth: "130px",
+                  border: "1px solid #eee",
                 }}
               >
-                <button 
+                <button
                   onClick={handleLogout}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    width: '100%',
-                    padding: '10px',
-                    border: 'none',
-                    background: 'none',
-                    color: '#ff4d4f',
-                    cursor: 'pointer',
-                    fontWeight: '500',
-                    fontSize: '14px',
-                    borderRadius: '5px'
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    width: "100%",
+                    padding: "16px",
+                    border: "none",
+                    background: "none",
+                    color: "#ff4d4f",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                    fontSize: "16px",
+                    borderRadius: "25px",
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#fff1f0'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#fff1f0")
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.backgroundColor = "transparent")
+                  }
                 >
                   <LogOut size={16} />
                   Logout

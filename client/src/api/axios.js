@@ -19,5 +19,19 @@ api.interceptors.request.use((config) => {
 
   return config;
 });
-
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Agar status 401 hai, matlab token expire ya invalid ho gaya
+    if (error.response && error.response.status === 401) {
+      console.warn("Session expired. Logging out...");
+      
+      localStorage.removeItem("user"); // Data saaf karein
+      
+      // User ko login page par bhej dein
+      window.location.href = "/login"; 
+    }
+    return Promise.reject(error);
+  }
+);
 export default api;

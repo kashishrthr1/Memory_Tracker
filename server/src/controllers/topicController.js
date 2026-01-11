@@ -2,7 +2,7 @@ const Topic = require('../models/Topic');
 const { analyzeAssessment, calculateStability } = require('../services/assessment.service');
 const { calculateCurrentScore, calculateOptimalDate,calculateScoreAtDate } = require('../services/memory.service');
 const { getFiveDayCalendar } = require('../services/calendar.service');
-const { getWeeklyAverageScore } = require('../services/analytics.service');
+const { getWeeklyStats } = require('../services/analytics.service');
 const Activity = require('../models/Activity');
 
 
@@ -154,17 +154,19 @@ exports.getFiveDayRevision = async (req, res) => {
 };
 
 exports.getDashboardStats = async (req, res) => {
-  try {
-    const topics = await Topic.find({ userId: req.user.id });
+    try {
+        const topics = await Topic.find({ userId: req.user.id });
+        
+        // Naya Stats helper call karein
+        const stats = getWeeklyStats(topics);
 
-    const weeklyAverage = getWeeklyAverageScore(topics);
-
-    res.json({
-      averageWeeklyMemoryScore: weeklyAverage
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+        res.json({
+            averageWeeklyMemoryScore: stats.averageWeeklyMemoryScore,
+            trend: stats.trend
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 };
 exports.getRecentActivities = async (req, res) => {
   try {
@@ -197,7 +199,12 @@ exports.getTopicHistory = async (req, res) => {
       targetDate.setDate(now.getDate() - i);
       
       // Din ke aakhir ka score nikalne ke liye time set karein
-      targetDate.setHours(23, 59, 59, 999);
+       if (i !== 0) {
+        targetDate.setHours(23, 59, 59, 999);
+      } else {
+        // Aaj ke liye exact abhi ka waqt (now) rehne dein
+        targetDate.setTime(now.getTime());
+      }
 
       // Agar targetDate topic ke banne se pehle ki hai, toh use skip karein
       if (targetDate < new Date(topic.createdAt)) continue;

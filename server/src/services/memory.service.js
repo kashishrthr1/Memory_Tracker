@@ -3,8 +3,9 @@ function calculateScoreAtDate(topic, targetDate) {
   const target = new Date(targetDate);
   const createdAt = new Date(topic.createdAt);
 
+   if (target < createdAt) return NaN;
   // 1. Agar target date topic banne se pehle ki hai, toh 0 ya null return karo
-  if (target < createdAt) return 0;
+  
 
   // 2. Woh saari revisions nikaalo jo is target date se pehle ya is din hui thi
   // 'revisionHistory' array aapke Topic model mein store hai
@@ -27,7 +28,7 @@ function calculateScoreAtDate(topic, targetDate) {
   }
 
   // 3. Time difference nikaalo (Target Date aur Revision Date ke beech)
-  const daysSince = (target - startDate) / (1000 * 60 * 60 * 24);
+  const daysSince = Math.max(0,(target - startDate) / (1000 * 60 * 60 * 24));
 
   // 4. Ebbinghaus Forgetting Curve apply karo
   // Stability har revision ke baad badhti hai, isliye graph flatter dikhega

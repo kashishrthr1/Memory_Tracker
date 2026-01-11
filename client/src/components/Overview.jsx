@@ -3,20 +3,21 @@
 import React, { useEffect, useState } from "react";
 import RevisionModal from "./RevisionModal";
 
-const Overview = ({ score = 42, nextTopic ,userName}) => {
+const Overview = ({ score = 0, trend = 0, nextTopic ,userName}) => {
   const [animatedScore, setAnimatedScore] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     // Small delay to ensure the transition is visible after component mount
-    const timer = setTimeout(() => setAnimatedScore(score), 200);
+    const timer = setTimeout(() => setAnimatedScore(score), 5);
     return () => clearTimeout(timer);
   }, [score]);
 
   const chartStyle = {
     "--progress": animatedScore,
   };
-
+  const trendClass = trend >= 0 ? "positive" : "negative";
+  const trendIcon = trend >= 0 ? "▲" : "▼";
   return (
     <section className="overview">
       <div className="overview-top">
@@ -47,9 +48,11 @@ const Overview = ({ score = 42, nextTopic ,userName}) => {
             </div>
 
             <div className="pie-meta">
-              <span className="pie-trend positive">▲ +10% this week</span>
+              <span className={`pie-trend ${trendClass}`}>{trendIcon} {Math.abs(trend)}% this week</span>
               <p className="pie-insight">
-                Strong retention — keep revising consistently
+                {trend >= 0 
+                  ? "Strong retention — keep revising consistently" 
+                  : "Memory is decaying — time for some quick revisions"}
               </p>
             </div>
           </div>

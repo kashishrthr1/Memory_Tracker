@@ -1,27 +1,4 @@
-// import Navbar from "../components/Navbar";
-// import Footer from "../components/Footer";
-// import Overview from "../components/Overview";
-// import TopicList from "../components/TopicList";
-// import RevisionGuide from "../components/RevisionGuide";
-// import RecentActivity from "../components/RecentActivity";
-// import "../styles/dashboard.css";
 
-// const DashboardPage = () => {
-//   return (
-//     <div className="app-container">
-//       <Navbar />
-
-//       <main className="dashboard-container">
-//         <Overview score={72} />
-//         <TopicList />
-//         <RevisionGuide />
-//         <RecentActivity></RecentActivity>
-//       </main>
-
-//       <Footer />
-//     </div>
-//   );
-// };
 
 // export default DashboardPage;
 import React, { useEffect, useState } from "react";
@@ -31,13 +8,15 @@ import TopicList from "../components/TopicList";
 import RevisionGuide from "../components/RevisionGuide";
 import RecentActivity from "../components/RecentActivity";
 import Footer from "../components/Footer";
+import useAutoLogout from "../hooks/useAutoLogout";
 import "../styles/dashboard.css";
 
 // 1. Function import bilkul sahi hai
 import { getWeeklyAverageMemoryScore,fetchTopics,getRecentActivities} from "../api/topic";
 
 const DashboardPage = () => {
-  const [weeklyScore, setWeeklyScore] = useState(0);
+  useAutoLogout(30);
+ const [stats, setStats] = useState({ score: 0, trend: 0 });
   const [loading, setLoading] = useState(true);
 
   const [userName, setUserName] = useState("");
@@ -69,7 +48,10 @@ const DashboardPage = () => {
     try {
       // 1. Fetch Weekly Stats
       const statsRes = await getWeeklyAverageMemoryScore();
-      setWeeklyScore(statsRes.data.averageWeeklyMemoryScore);
+      setStats({
+        score: statsRes.data.averageWeeklyMemoryScore,
+        trend: statsRes.data.trend
+      });
 
       // 2. Fetch Topics for the Milestone logic
       // Assuming you have a fetchTopics API function
@@ -112,7 +94,8 @@ const DashboardPage = () => {
       <main className="dashboard-container">
         {/* Pass nextTopicData to Overview */}
         <Overview 
-          score={loading ? 0 : weeklyScore} 
+          score={loading ? 0 : stats.score} 
+          trend={loading ? 0 : stats.trend}
           userName={userName} 
           nextTopic={nextTopicData}
         />

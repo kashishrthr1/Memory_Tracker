@@ -16,7 +16,7 @@
 /* ---------- TOP SECTION (2 : 1) ---------- */
 .overview-top {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1.8fr 1.2fr;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -28,9 +28,29 @@
 }
 
 .welcome-header h1 {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   color: #1e293b;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+/* Welcome box should feel calm, not heavy */
+.welcome-box {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  box-shadow: none;
+  border: 1px solid #e5e7eb;
+}
+
+/* Reduce visual noise */
+.welcome-description {
+  color: #475569;
+}
+
+
+.date-display {
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .score-subtext {
@@ -72,16 +92,64 @@
   background: #ffffff;
   padding: 1.5rem;
   border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+.memory-row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 18px;
 }
 
+/* LEFT MESSAGE */
+.memory-message {
+  flex: 1;
+}
+
+.memory-primary {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.memory-secondary {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+/* PIE — prevent it from shrinking */
+.pie-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+}
+
+/* RIGHT META */
+.pie-meta-new {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 90px;
+}
+
+
 /* ---------- GRAPH ---------- */
-.graph-box .box-header {
+/* ---------- PROGRESS BOX (Was Graph) ---------- */
+.progress-box .box-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
+.box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 
 .label {
   font-weight: 600;
@@ -94,24 +162,247 @@
   color: #64748b;
 }
 
-.line-placeholder {
-  min-height: 200px;
-  border: 2px dashed #e2e8f0;
-  border-radius: 10px;
-  background: #f1f5f9;
+.today-progress-container {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  color: #94a3b8;
+  flex: 1;
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 10px;
+  background: #e5e7eb;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  position: relative;
+  margin-top: 4rem;
+}
+
+@keyframes progressPulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.85; }
+  100% { opacity: 1; }
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #6366f1 0%,
+    #818cf8 50%,
+    #a5b4fc 100%
+  );
+  border-radius: 99px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+  animation: progressPulse 2.5s infinite ease-in-out;
+}
+
+
+.progress-text {
+  font-size: 0.9rem;
+  color: #64748b;
+  text-align: center;
+  font-weight: 500;
+}
+
+.momentum-wrapper {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.momentum-track {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 6px;
+  width: 26px;
+}
+
+.momentum-segment {
+  height: 18px;
+  border-radius: 6px;
+  background: #e5e7eb;
+  transition: all 0.4s ease;
+}
+
+/* Active segments */
+.momentum-segment.active {
+  background: linear-gradient(
+    180deg,
+    #6366f1,
+    #818cf8
+  );
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
+}
+
+/* Subtle pulse for last active segment */
+.momentum-segment.active:last-child {
+  animation: pulseGlow 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Right-side text */
+.momentum-info {
+  flex: 1;
+}
+
+.momentum-percent {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #6366f1;
+  margin-bottom: 4px;
+}
+
+.momentum-segment.active {
+  background: linear-gradient(
+    180deg,
+    hsl(calc(var(--p) * 1.2), 90%, 60%),
+    #818cf8
+  );
+}
+.progress-wrapper {
+  margin-top: 5rem;
+
+}
+.progress-wrapper {
+  margin-top: 16px;
+}
+
+/* Subheading block */
+.progress-context {
+  margin-bottom: 14px;
+  margin-top: 2rem;
+}
+
+.context-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.context-subtitle {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+
+.progress-bar {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    #e5e7eb,
+    #f8fafc
+  );
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #6366f1,
+    #818cf8,
+    #a5b4fc
+  );
+  transition: width 0.6s ease;
+}
+
+/* subtle depth */
+.progress-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* Numbers below */
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.progress-value {
+  font-weight: 600;
+}
+
+.progress-percent {
+  font-weight: 700;
+  color: #6366f1;
+}
+
+.progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+
+.no-tasks-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.check-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.25rem;
 }
 
 /* ---------- REVISION BOX ---------- */
 .revision-box {
-  border: 2px solid #4f46e5;
+  border: 1px solid #c7d2fe;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  background: linear-gradient(180deg, #ffffff, #eef2ff);
 }
+
 
 .revision-details {
   display: flex;
@@ -160,11 +451,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  letter-spacing: 0.02em;
 }
 
+
 .revise-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.01);
   background: #4338ca;
-  transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3);
 }
 
@@ -174,86 +467,121 @@
 }
 
 /* ---------- PIE CHART ---------- */
+/* ---------- PIE CHART (SVG) ---------- */
 .pie-container {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
+  position: relative;
 }
 
-.pie-chart {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background: conic-gradient(
-    #6366f1 calc(var(--progress) * 1%),
-    #e5e7eb 0
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 1.2s ease-out;
-  animation: pop 0.6s ease-out;
+.pie-svg {
+  transform: rotate(0deg); 
+  display: block;
 }
 
-.pie-inner {
-  width: 130px;
-  height: 130px;
-  background: white;
-  border-radius: 50%;
+.pie-svg circle:first-child {
+  stroke: #f1f5f9;
+}
+
+.pie-circle-anim {
+  filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.35));
+}
+
+.pie-number {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.overview-chart {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+
+.overview-chart:hover .pie-circle-anim {
+  filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.55));
+}
+
+.overview-chart-text{
+  font-size: 1rem;
+  font-weight: 500;
+  width: 40%;
+  margin: 1rem;
+}
+
+
+.pie-circle-anim {
+  transition: stroke-dashoffset 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pie-content-abs {
+  position: absolute;
+  top: 45%; 
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  pointer-events: none;
 }
 
 .welcome-description {
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: #334155;
-  margin-top: 12px;
+  margin-top: 1rem;
 }
 
-.welcome-description.muted {
-  color: #64748b;
+.welcome-description strong {
+  color: #4f46e5;
 }
-
 
 .pie-number {
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
 }
 
 .pie-label {
   font-size: 0.75rem;
   color: #64748b;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
-.pie-meta {
-  margin-top: 14px;
-  text-align: center;
+.pie-meta-new {
+  margin-top: 5px;
+  margin-left: 0.5rem; /* Adjust spacing below SVG */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
 .pie-trend {
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .pie-trend.positive {
   color: #16a34a;
 }
 
-.pie-insight {
-  font-size: 0.75rem;
-  color: #475569;
-  margin-top: 4px;
+.pie-label-sm {
+  font-size: 0.7rem;
+  color: #94a3b8;
 }
 
-.welcome-sub {
-  font-size: 0.85rem;
-  color: #475569;
-  margin-top: 4px;
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
 }
 
 .quick-stats {
@@ -278,7 +606,7 @@
 }
 
 .box:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   transition: transform 0.2s ease;
 }
 

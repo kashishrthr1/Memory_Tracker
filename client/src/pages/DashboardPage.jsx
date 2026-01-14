@@ -98,6 +98,8 @@ const DashboardPage = () => {
           trend={loading ? 0 : stats.trend}
           userName={userName} 
           nextTopic={nextTopicData}
+          topics={topics || []}
+          activities={activities || []}
         />
 
         {/* Pass topics and refresh function to TopicList so it doesn't fetch independently */}

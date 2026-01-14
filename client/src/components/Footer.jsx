@@ -39,6 +39,7 @@
 // export default Footer;
 
 import logo1 from "../assets/logo1.svg";
+import { Linkedin, Github } from "lucide-react";
 
 const Footer = () => {
   const sections = [
@@ -88,10 +89,25 @@ const Footer = () => {
             <p>
               <span className="dot"></span> hello@learncurve.com
             </p>
-            <div className="social-placeholders">
-              <div className="social-dot"></div>
-              <div className="social-dot"></div>
-              <div className="social-dot"></div>
+            <div className="social-icons">
+              <a
+                href="www.linkedin.com/in/kashishh-rathore"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={18} />
+              </a>
+              <a
+                href="https://github.com/kashishrthr1/Memory_Tracker"
+                aria-label="GitHub"
+              >
+                <Github size={18} />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/ayush-jadon-33a01a2ba/"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={18} />
+              </a>
             </div>
           </div>
         </div>

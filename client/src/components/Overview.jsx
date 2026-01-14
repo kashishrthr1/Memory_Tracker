@@ -1,92 +1,234 @@
-
-
 import React, { useEffect, useState } from "react";
 import RevisionModal from "./RevisionModal";
 
-const Overview = ({ score = 0, trend = 0, nextTopic ,userName}) => {
+const Overview = ({
+  score = 0,
+  trend = 0,
+  nextTopic,
+  userName,
+  topics = [],
+  activities = [],
+}) => {
   const [animatedScore, setAnimatedScore] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    // Small delay to ensure the transition is visible after component mount
-    const timer = setTimeout(() => setAnimatedScore(score), 5);
+    const timer = setTimeout(() => setAnimatedScore(score), 100);
     return () => clearTimeout(timer);
   }, [score]);
 
-  const chartStyle = {
-    "--progress": animatedScore,
-  };
+  // --- Logic: Topics Due & Progress ---
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // 1. Identify topics due today or overdue
+  const dueTopics = topics.filter((t) => {
+    if (!t.optimalRevisionDate) return false;
+    const dueDate = new Date(t.optimalRevisionDate);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate <= today;
+  });
+
+  const dueCount = dueTopics.length;
+
+  // 2. Identify revisions completed TODAY (from activities)
+  // assuming activities have a 'date' or 'timestamp' and 'type' === 'revision'
+  const revisionsToday = activities.filter((act) => {
+    const actDate = new Date(act.date || act.timestamp);
+    actDate.setHours(0, 0, 0, 0);
+    return actDate.getTime() === today.getTime() && act.type === "revision";
+  });
+
+  const revisedCount = revisionsToday.length;
+
+  // 3. Progress Calculation
+  // We want the progress bar to fill up as we revise the 'due' topics.
+  // Maximum value = (Due count at start of day).
+  // Since we don't track "start of day" due count, we can approximate:
+  // Total Target = Current Due + Revised Today.
+  const totalTarget = dueCount + revisedCount;
+  const progressPercent =
+    totalTarget === 0 ? 100 : (revisedCount / totalTarget) * 100;
+
+  // --- Logic: Pie Chart Animation ---
+  const radius = 50;
+  const circumference = 2 * Math.PI * radius;
+  // If score is 80%, we want to show 80% of the circle
+  // strokeDashoffset = circumference - (score / 100) * circumference
+  const strokeDashoffset =
+    circumference - (animatedScore / 100) * circumference;
+
   const trendClass = trend >= 0 ? "positive" : "negative";
   const trendIcon = trend >= 0 ? "▲" : "▼";
+
+  const progressMessage =
+    totalTarget === 0
+      ? "You're ahead of schedule today 🎉"
+      : revisedCount === 0
+      ? "Starting is the hardest part — just one topic helps."
+      : revisedCount === totalTarget
+      ? "Perfect day. You completed everything 💯"
+      : "Nice momentum — keep going.";
+
   return (
     <section className="overview">
       <div className="overview-top">
-        <div className="overview-text box">
+        {/* WELCOME SECTION */}
+        <div className="overview-text box welcome-box">
           <div className="welcome-header">
-            <h1>Welcome back, {userName || "Student"} </h1>
+            <h1>Hi, {userName || "Student"}! 👋</h1>
+            <p className="date-display">
+              {today.toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
           </div>
 
           <p className="welcome-description">
-            You’re making steady progress in strengthening your memory.
-            Consistent revisions over time help lock concepts in and reduce
-            last-minute stress.
+            Your brain is <strong>{animatedScore}% charged</strong> today.
+            {dueCount > 0
+              ? ` You have ${dueCount} topics waiting for reviewing.`
+              : " You're all caught up! Great job."}
           </p>
-
-          <p className="welcome-description muted">
-            Today is a good day to revisit one pending topic and reinforce what
-            you already know. Small sessions compound into long-term retention.
-          </p>
+          <div className="quick-stats">
+            <div className="stat">
+              <p className="stat-value">{dueCount}</p>
+              <p className="stat-label">Due Today</p>
+            </div>
+            <div className="stat">
+              <p className="stat-value">{revisedCount}</p>
+              <p className="stat-label">Done</p>
+            </div>
+          </div>
         </div>
 
+        {/* PIE CHART SECTION */}
         <div className="overview-chart box">
-          <div className="pie-container">
-            <div className="pie-chart" style={chartStyle}>
-              <div className="pie-inner">
-                <span className="pie-number">{animatedScore}%</span>
-                <span className="pie-label">Memory Score</span>
+          {/* HEADER — top left */}
+          <div className="box-header">
+            <p className="label">Memory Score</p>
+            <span className="sub-label">This week</span>
+          </div>
+
+          {/* HORIZONTAL CONTENT ROW */}
+          <div className="memory-row">
+            {/* MESSAGE */}
+            <div className="memory-message">
+              <p className="memory-primary">
+                Your retention is looking
+                <strong> {trend >= 0 ? " strong" : " weaker"} </strong>
+                this week.
+              </p>
+              <p className="memory-secondary">
+                Consistent revisions help maintain long-term memory.
+              </p>
+            </div>
+
+            {/* PIE */}
+            <div className="pie-container">
+              <svg
+                width="140"
+                height="140"
+                viewBox="0 0 120 120"
+                className="pie-svg"
+              >
+                <circle
+                  cx="60"
+                  cy="60"
+                  r={radius}
+                  fill="none"
+                  stroke="#e2e8f0"
+                  strokeWidth="12"
+                />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r={radius}
+                  fill="none"
+                  stroke="#6366f1"
+                  strokeWidth="12"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  className="pie-circle-anim"
+                  transform="rotate(-90 60 60)"
+                />
+              </svg>
+
+              <div className="pie-content-abs">
+                <span className="pie-number">{animatedScore}</span>
+                <span className="pie-label">Score</span>
               </div>
             </div>
 
-            <div className="pie-meta">
-              <span className={`pie-trend ${trendClass}`}>{trendIcon} {Math.abs(trend)}% this week</span>
-              <p className="pie-insight">
-                {trend >= 0 
-                  ? "Strong retention — keep revising consistently" 
-                  : "Memory is decaying — time for some quick revisions"}
-              </p>
+            {/* META */}
+            <div className="pie-meta-new">
+              <span className={`pie-trend ${trendClass}`}>
+                {trendIcon} {Math.abs(trend)}%
+              </span>
+              <span className="pie-label-sm">vs last week</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="overview-bottom">
-        <div className="box graph-box">
+        {/* TOPICS DUE / PROGRESS SECTION */}
+        <div className="box progress-box">
           <div className="box-header">
-            <p className="label">Memory Activity</p>
-            <span className="sub-label">Last 7 days</span>
+            <p className="label">Today's Goals</p>
+            <span className="sub-label">
+              {revisedCount}/{totalTarget} polished
+            </span>
           </div>
-          <div className="line-placeholder">
-            {/* Replace with a chart library like Recharts later */}
-            <p>Activity visualization</p>
+
+          <div className="progress-wrapper">
+            {/* NEW SUBHEADING */}
+            <div className="progress-context">
+              <p className="context-title">Daily Revision Progress</p>
+              <p className="context-subtitle">Based on topics due today</p>
+            </div>
+
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{ width: `${progressPercent}%` }}
+              />
+              <div className="progress-glow" />
+            </div>
+
+            <div className="progress-meta">
+              <span className="progress-value">
+                {revisedCount} / {totalTarget}
+              </span>
+              <span className="progress-percent">
+                {Math.round(progressPercent)}%
+              </span>
+            </div>
+
+            <p className="progress-text">{progressMessage}</p>
           </div>
         </div>
 
+        {/* REVISION BOX (NEXT MILESTONE) */}
         <div className="box revision-box">
           <div className="box-header">
-            <p className="label">Next Milestone</p>
+            <p className="label">Up Next</p>
           </div>
 
           <div className="revision-details">
             <div className="detail-item">
               <span className="detail-label">TOPIC</span>
-              <span className="detail-value">
-                {nextTopic ? nextTopic.name : "Relax, you're caught up!"}
+              <span className="detail-value truncate">
+                {nextTopic ? nextTopic.name : "All clear!"}
               </span>
             </div>
             <div className="detail-item">
-              <span className="detail-label">DUE DATE</span>
+              <span className="detail-label">DUE</span>
               <span className="detail-value">
-                {nextTopic ? nextTopic.nextRevision : "No tasks pending"}
+                {nextTopic ? nextTopic.nextRevision : "-"}
               </span>
             </div>
           </div>
@@ -94,17 +236,17 @@ const Overview = ({ score = 0, trend = 0, nextTopic ,userName}) => {
           <div className="revision-action">
             <button
               className="btn-primary revise-btn"
-             onClick={() => setIsModalOpen(true)}
+              onClick={() => nextTopic && setIsModalOpen(true)}
+              disabled={!nextTopic}
             >
-              Start Revision Session
+              Start Session
             </button>
-
-            <p className="revise-question">Boost your score by 5% today</p>
           </div>
         </div>
       </div>
+
       {nextTopic && (
-        <RevisionModal 
+        <RevisionModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           topicId={nextTopic.id}

@@ -53,10 +53,15 @@ exports.getTopics = async (req, res) => {
     const topics = await Topic.find({ userId: req.user.id });
 
     const now = new Date();
+     const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
     const results = topics.map(topic => {
       const currentScore = calculateCurrentScore(topic, now);
-      const optimalDate = calculateOptimalDate(topic);
 
+      let optimalDate = calculateOptimalDate(topic);
+        if (!optimalDate || optimalDate < today) {
+        optimalDate = today;
+      }
       return {
         ...topic.toObject(),
         currentScore: Math.round(currentScore),

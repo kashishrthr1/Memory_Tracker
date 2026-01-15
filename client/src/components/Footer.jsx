@@ -91,7 +91,7 @@ const Footer = () => {
             </p>
             <div className="social-icons">
               <a
-                href="www.linkedin.com/in/kashishh-rathore"
+                href="https://www.linkedin.com/in/kashishh-rathore/"
                 aria-label="LinkedIn"
               >
                 <Linkedin size={18} />

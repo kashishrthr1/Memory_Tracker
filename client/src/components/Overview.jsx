@@ -7,7 +7,8 @@ const Overview = ({
   nextTopic,
   userName,
   topics = [],
-  activities = [],
+  revisedTodayCount = 0,
+  
 }) => {
   const [animatedScore, setAnimatedScore] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,22 +34,17 @@ const Overview = ({
 
   // 2. Identify revisions completed TODAY (from activities)
   // assuming activities have a 'date' or 'timestamp' and 'type' === 'revision'
-  const revisionsToday = activities.filter((act) => {
-    const actDate = new Date(act.date || act.timestamp);
-    actDate.setHours(0, 0, 0, 0);
-    return actDate.getTime() === today.getTime() && act.type === "revision";
-  });
 
-  const revisedCount = revisionsToday.length;
+  
 
   // 3. Progress Calculation
   // We want the progress bar to fill up as we revise the 'due' topics.
   // Maximum value = (Due count at start of day).
   // Since we don't track "start of day" due count, we can approximate:
   // Total Target = Current Due + Revised Today.
-  const totalTarget = dueCount + revisedCount;
+  const totalTarget = dueCount + revisedTodayCount;
   const progressPercent =
-    totalTarget === 0 ? 100 : (revisedCount / totalTarget) * 100;
+    totalTarget === 0 ? 100 : (revisedTodayCount / totalTarget) * 100;
 
   // --- Logic: Pie Chart Animation ---
   const radius = 50;
@@ -64,9 +60,9 @@ const Overview = ({
   const progressMessage =
     totalTarget === 0
       ? "You're ahead of schedule today 🎉"
-      : revisedCount === 0
+      : revisedTodayCount === 0
       ? "Starting is the hardest part — just one topic helps."
-      : revisedCount === totalTarget
+      : revisedTodayCount === totalTarget
       ? "Perfect day. You completed everything 💯"
       : "Nice momentum — keep going.";
 
@@ -98,7 +94,7 @@ const Overview = ({
               <p className="stat-label">Due Today</p>
             </div>
             <div className="stat">
-              <p className="stat-value">{revisedCount}</p>
+              <p className="stat-value">{revisedTodayCount}</p>
               <p className="stat-label">Done</p>
             </div>
           </div>
@@ -180,7 +176,7 @@ const Overview = ({
           <div className="box-header">
             <p className="label">Today's Goals</p>
             <span className="sub-label">
-              {revisedCount}/{totalTarget} polished
+              {revisedTodayCount}/{totalTarget} polished
             </span>
           </div>
 
@@ -201,7 +197,7 @@ const Overview = ({
 
             <div className="progress-meta">
               <span className="progress-value">
-                {revisedCount} / {totalTarget}
+                {revisedTodayCount} / {totalTarget}
               </span>
               <span className="progress-percent">
                 {Math.round(progressPercent)}%

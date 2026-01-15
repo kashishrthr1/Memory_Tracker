@@ -19,10 +19,10 @@ function getAverageForDate(topics, date) {
 
 function getWeeklyStats(topics) {
     const today = new Date();
-    let weeklyTotal = 0;
-    let validDays = 0;
+    let currentWeekTotal = 0;
+    let currentValidDays = 0;
 
-    // 1. Current Weekly Average Calculate karna (Pichle 7 din ka moving average)
+    // 1. Current Week Average (Last 7 days: 0-6)
     for (let i = 0; i < 7; i++) {
         const day = new Date(today);
         day.setDate(today.getDate() - i);
@@ -30,24 +30,35 @@ function getWeeklyStats(topics) {
 
         const dailyAvg = getAverageForDate(topics, day);
         if (dailyAvg !== null) {
-            weeklyTotal += dailyAvg;
-            validDays++;
+            currentWeekTotal += dailyAvg;
+            currentValidDays++;
         }
     }
 
-    const currentWeeklyAvg = validDays === 0 ? 0 : (weeklyTotal / validDays);
+    const currentWeeklyAvg = currentValidDays === 0 ? 0 : (currentWeekTotal / currentValidDays);
 
-    // 2. Trend Logic: Pichle hafte (7 days ago) ka comparison point
-    // Hum dekh rahe hain ki 7 din pehle user ka "Daily Average" kya tha
-    const sevenDaysAgo = new Date(today);
-    sevenDaysAgo.setDate(today.getDate() - 7);
-    sevenDaysAgo.setHours(23, 59, 59, 999);
+    // 2. Previous Week Average (Days 7-13)
+    let previousWeekTotal = 0;
+    let previousValidDays = 0;
 
-    const pastAvg = getAverageForDate(topics, sevenDaysAgo);
+    for (let i = 7; i < 14; i++) {
+        const day = new Date(today);
+        day.setDate(today.getDate() - i);
+        day.setHours(23, 59, 59, 999);
 
-    // Trend = Current - Past (e.g., 29% - 0% = +29)
-    // Agar koi past data nahi hai (naya user), toh trend 0 dikhayenge
-    const trend = pastAvg !== null ? Math.round(currentWeeklyAvg - pastAvg) : 0;
+        const dailyAvg = getAverageForDate(topics, day);
+        if (dailyAvg !== null) {
+            previousWeekTotal += dailyAvg;
+            previousValidDays++;
+        }
+    }
+
+    const previousWeeklyAvg = previousValidDays === 0 ? 0 : (previousWeekTotal / previousValidDays);
+
+    // 3. Calculate Trend (Week-over-Week comparison)
+    const trend = previousWeeklyAvg !== 0 
+        ? Math.round(currentWeeklyAvg - previousWeeklyAvg) 
+        : 0;
 
     return {
         averageWeeklyMemoryScore: Math.round(currentWeeklyAvg),

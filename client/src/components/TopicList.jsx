@@ -152,6 +152,8 @@ const TopicList = () => {
       </div>
 
       <div className="topic-labels">
+        <span>#</span> {/* Serial Placeholder */}
+        <span></span>  {/* Strip Placeholder */}
         <span>Name</span>
         <span>Next Revision</span>
         <span>Memory Score</span>

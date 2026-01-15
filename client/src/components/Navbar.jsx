@@ -10,14 +10,33 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
   // Add glassmorphism effect on scroll
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
+    
+    // 2. Function to sync login state
+    const syncLoginState = () => {
+      setIsLoggedIn(!!localStorage.getItem("token"));
+    };
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    // 3. Listen for storage changes (works across tabs)
+    window.addEventListener("storage", syncLoginState);
+    
+    // 4. Custom event for local changes (same tab)
+    window.addEventListener("loginStateChange", syncLoginState);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("storage", syncLoginState);
+      window.removeEventListener("loginStateChange", syncLoginState);
+    };
   }, []);
 
-  const isLoggedIn = !!localStorage.getItem("token");
+  
 
   const handleDashboardClick = () => {
     if (!isLoggedIn) {
@@ -29,10 +48,15 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setShowDropdown(false); // Close dropdown on logout
+    localStorage.removeItem("user"); // Clear user data too
+    setIsLoggedIn(false); // Update state immediately
+    setShowDropdown(false);
+    
+    // Notify other parts of the app
+    window.dispatchEvent(new Event("loginStateChange")); 
+    
     navigate("/login");
   };
-
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="logo-switch">

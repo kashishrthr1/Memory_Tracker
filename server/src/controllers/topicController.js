@@ -1,6 +1,6 @@
 const Topic = require('../models/Topic');
 const { analyzeAssessment, calculateStability } = require('../services/assessment.service');
-const { calculateCurrentScore, calculateOptimalDate,calculateScoreAtDate } = require('../services/memory.service');
+const { calculateCurrentScore, calculateOptimalDate, calculateScoreAtDate } = require('../services/memory.service');
 const { getFiveDayCalendar } = require('../services/calendar.service');
 const { getWeeklyStats } = require('../services/analytics.service');
 const Activity = require('../models/Activity');
@@ -53,13 +53,13 @@ exports.getTopics = async (req, res) => {
     const topics = await Topic.find({ userId: req.user.id });
 
     const now = new Date();
-     const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const results = topics.map(topic => {
       const currentScore = calculateCurrentScore(topic, now);
 
       let optimalDate = calculateOptimalDate(topic);
-        if (!optimalDate || optimalDate < today) {
+      if (!optimalDate || optimalDate < today) {
         optimalDate = today;
       }
       return {
@@ -116,16 +116,16 @@ exports.reviseTopic = async (req, res) => {
     const optimalDate = calculateOptimalDate(topic);
     console.log('📅 Optimal Date for', topic.topicName, ':', optimalDate.toISOString());
 
-    const pointsDifference = Math.round(averageScore- scoreBefore);
+    const pointsDifference = Math.round(averageScore - scoreBefore);
 
-let displayScore;
-if (pointsDifference > 0) {
-    displayScore = `+${pointsDifference}%`; // Standard gain
-} else if (pointsDifference < 0) {
-    displayScore = `${pointsDifference}%`; // Will show as "-5%"
-} else {
-    displayScore = "0%"; // No change
-}
+    let displayScore;
+    if (pointsDifference > 0) {
+      displayScore = `+${pointsDifference}%`; // Standard gain
+    } else if (pointsDifference < 0) {
+      displayScore = `${pointsDifference}%`; // Will show as "-5%"
+    } else {
+      displayScore = "0%"; // No change
+    }
 
     await Activity.create({
       userId: req.user.id,
@@ -159,33 +159,47 @@ exports.getFiveDayRevision = async (req, res) => {
 };
 
 exports.getDashboardStats = async (req, res) => {
-    try {
-        const topics = await Topic.find({ userId: req.user.id });
-        
-        // Naya Stats helper call karein
-        const stats = getWeeklyStats(topics);
+  try {
+    const topics = await Topic.find({ userId: req.user.id });
 
-        res.json({
-            averageWeeklyMemoryScore: stats.averageWeeklyMemoryScore,
-            trend: stats.trend
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    // Naya Stats helper call karein
+    const stats = getWeeklyStats(topics);
+
+    res.json({
+      averageWeeklyMemoryScore: stats.averageWeeklyMemoryScore,
+      trend: stats.trend
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 exports.getRecentActivities = async (req, res) => {
   try {
-    // 1. Fetch activities linked to the user ID from the 'protect' middleware
-    const activities = await Activity.find({ userId: req.user.id })
-      .sort({ createdAt: -1 }) // 2. Newest first (Descending)
-      .limit(5);             // 3. Limit to 10 for dashboard performance
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    res.status(200).json(activities);
+    // 1. Get the last 5 activities for the "Recent Activity" list
+    const recentActivities = await Activity.find({ userId: req.user.id })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    // 2. 🟢 NEW: Get the total count of revisions done TODAY specifically
+    // This ignores the limit of 5 so your progress bar stays accurate
+    const revisedTodayCount = await Activity.countDocuments({
+      userId: req.user.id,
+      activityType: 'revised',
+      createdAt: { $gte: today } // Filters for today only
+    });
+
+    res.status(200).json({
+      activities: recentActivities,
+      revisedTodayCount: revisedTodayCount
+    });
   } catch (err) {
-    res.status(500).json({ 
-      success: false, 
-      message: "Failed to fetch activities", 
-      error: err.message 
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch activities",
+      error: err.message
     });
   }
 };
@@ -202,9 +216,9 @@ exports.getTopicHistory = async (req, res) => {
     for (let i = lookbackDays; i >= 0; i--) {
       const targetDate = new Date();
       targetDate.setDate(now.getDate() - i);
-      
+
       // Din ke aakhir ka score nikalne ke liye time set karein
-       if (i !== 0) {
+      if (i !== 0) {
         targetDate.setHours(23, 59, 59, 999);
       } else {
         // Aaj ke liye exact abhi ka waqt (now) rehne dein
@@ -239,7 +253,7 @@ exports.deleteTopic = async (req, res) => {
 
     // Security: Ensure the user owns this topic
     // deleteTopic controller mein change karein:
-       if (topic.userId.toString() !== req.user._id.toString()) {
+    if (topic.userId.toString() !== req.user._id.toString()) {
       return res.status(401).json({ error: "User not authorized" });
     }
 

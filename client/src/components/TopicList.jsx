@@ -30,41 +30,41 @@ const TopicList = () => {
 
   /* ---------------- FETCH TOPICS ---------------- */
   const loadData = async () => {
-  try {
-    const res = await fetchTopics();
-    const fetchedTopics = res.data;
+    try {
+      const res = await fetchTopics();
+      const fetchedTopics = res.data;
 
-    // Loop through each topic to log the details
-    fetchedTopics.forEach(topic => {
-      console.log('📅 Topic:', topic.topicName);
-      console.log('   - optimalRevisionDate (raw):', topic.optimalRevisionDate);
-      console.log('   - Parsed Date:', new Date(topic.optimalRevisionDate));
-      console.log('   - Displayed as:', new Date(topic.optimalRevisionDate).toLocaleDateString('en-GB'));
-      console.log('   - stability:', topic.stability);
-      console.log('---');
-    });
+      // Loop through each topic to log the details
+      fetchedTopics.forEach(topic => {
+        console.log('📅 Topic:', topic.topicName);
+        console.log('   - optimalRevisionDate (raw):', topic.optimalRevisionDate);
+        console.log('   - Parsed Date:', new Date(topic.optimalRevisionDate));
+        console.log('   - Displayed as:', new Date(topic.optimalRevisionDate).toLocaleDateString('en-GB'));
+        console.log('   - stability:', topic.stability);
+        console.log('---');
+      });
 
-    setTopics(fetchedTopics);
-  } catch (err) {
-    console.error("❌ API Error:", err.response?.data || err.message);
-    console.log("Could not load topics.");
-  }
-};
+      setTopics(fetchedTopics);
+    } catch (err) {
+      console.error("❌ API Error:", err.response?.data || err.message);
+      console.log("Could not load topics.");
+    }
+  };
 
   useEffect(() => {
     loadData();
     const handleRefresh = () => {
-    console.log("Refreshing data from event...");
-    loadData();
-  };
+      console.log("Refreshing data from event...");
+      loadData();
+    };
 
-  window.addEventListener("refreshCalendar", handleRefresh);
-  window.addEventListener("refreshDashboardData", handleRefresh);
+    window.addEventListener("refreshCalendar", handleRefresh);
+    window.addEventListener("refreshDashboardData", handleRefresh);
 
-  return () => {
-    window.removeEventListener("refreshCalendar", handleRefresh);
-    window.removeEventListener("refreshDashboardData", handleRefresh);
-  };
+    return () => {
+      window.removeEventListener("refreshCalendar", handleRefresh);
+      window.removeEventListener("refreshDashboardData", handleRefresh);
+    };
   }, []);
 
   /* ---------------- UPDATE SCORE (FROM REVISION) ---------------- */
@@ -109,8 +109,10 @@ const TopicList = () => {
 
       const res = await createTopic(payload);
       setScoreValue(Math.round(res.data.baseMemoryScore));
+      setScoreValue(Math.round(res.data.baseMemoryScore));
       window.dispatchEvent(new Event("refreshCalendar"));
-      loadData();
+      window.dispatchEvent(new Event("refreshDashboardData"));
+      // loadData(); // Removed, as event listener handles reload
     } catch (err) {
       console.error(err);
       setScoreValue("Error");
@@ -150,6 +152,8 @@ const TopicList = () => {
       </div>
 
       <div className="topic-labels">
+        <span>#</span> {/* Serial Placeholder */}
+        <span></span>  {/* Strip Placeholder */}
         <span>Name</span>
         <span>Next Revision</span>
         <span>Memory Score</span>
@@ -162,22 +166,31 @@ const TopicList = () => {
 
         {filteredAndSortedTopics.map((topic, index) => (
           <ListItem
-    key={topic._id}
-    id={topic._id}
-    index={index + 1}
-    name={topic.topicName}
-    score={topic.currentScore}
-    // Safe Date Parsing
-    nextRevision={
-      topic.optimalRevisionDate 
-        ? new Date(topic.optimalRevisionDate).toLocaleDateString('en-GB') 
-        : "Pending"
-    }
-    onUpdateScore={updateTopicScore}
-    // Baaki props jo Details Modal mein kaam aayenge
-    date={new Date(topic.createdAt).toLocaleDateString()} 
-    revisions={topic.revisionCount}
-  />
+            key={topic._id}
+            id={topic._id}
+            index={index + 1}
+            name={topic.topicName}
+            score={topic.currentScore}
+            // Safe Date Parsing
+            nextRevision={
+              topic.optimalRevisionDate
+                ? new Date(topic.optimalRevisionDate).toLocaleDateString('en-GB')
+                : "Pending"
+            }
+            onUpdateScore={updateTopicScore}
+            // Baaki props jo Details Modal mein kaam aayenge
+            date={new Date(topic.createdAt).toLocaleDateString()}
+            revisions={topic.revisionCount}
+            lastRevision={
+              topic.lastRevisedAt
+                ? new Date(topic.lastRevisedAt).toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric'
+                })
+                : "Not revised yet"
+            }
+          />
         ))}
       </div>
 

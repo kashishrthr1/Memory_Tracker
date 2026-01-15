@@ -2,6 +2,7 @@
 
 // export default DashboardPage;
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Overview from "../components/Overview";
 import TopicList from "../components/TopicList";
@@ -12,17 +13,22 @@ import useAutoLogout from "../hooks/useAutoLogout";
 import "../styles/dashboard.css";
 
 // 1. Function import bilkul sahi hai
-import { getWeeklyAverageMemoryScore,fetchTopics,getRecentActivities} from "../api/topic";
+import { getWeeklyAverageMemoryScore, fetchTopics, getRecentActivities } from "../api/topic";
 
 const DashboardPage = () => {
   useAutoLogout(30);
- const [stats, setStats] = useState({ score: 0, trend: 0 });
+  const [stats, setStats] = useState({ score: 0, trend: 0 });
   const [loading, setLoading] = useState(true);
 
   const [userName, setUserName] = useState("");
   const [topics, setTopics] = useState([]); // Add state for topics
 
   const [activities, setActivities] = useState([]);
+  const [todayRevisedCount, setTodayRevisedCount] = useState([]);
+
+  const navigate = useNavigate();
+
+
 
   useEffect(() => {
     // 1. LocalStorage se user nikalna aur correct key (username) use karna
@@ -55,11 +61,12 @@ const DashboardPage = () => {
 
       // 2. Fetch Topics for the Milestone logic
       // Assuming you have a fetchTopics API function
-      const topicsRes = await fetchTopics(); 
+      const topicsRes = await fetchTopics();
       setTopics(topicsRes.data);
 
-      const activityRes=await getRecentActivities();
-      setActivities(activityRes.data);
+      const activityRes = await getRecentActivities();
+      setActivities(activityRes.data.activities);
+      setTodayRevisedCount(activityRes.data.revisedTodayCount);
 
     } catch (err) {
       console.error("Dashboard data fetch error:", err);
@@ -82,8 +89,8 @@ const DashboardPage = () => {
 
   const nextTopicData = topTopic ? {
     name: topTopic.topicName,
-    nextRevision: topTopic.optimalRevisionDate 
-      ? new Date(topTopic.optimalRevisionDate).toLocaleDateString('en-GB') 
+    nextRevision: topTopic.optimalRevisionDate
+      ? new Date(topTopic.optimalRevisionDate).toLocaleDateString('en-GB')
       : "Pending",
     id: topTopic._id
   } : null;
@@ -93,24 +100,25 @@ const DashboardPage = () => {
       <Navbar />
       <main className="dashboard-container">
         {/* Pass nextTopicData to Overview */}
-        <Overview 
-          score={loading ? 0 : stats.score} 
+        <Overview
+          score={loading ? 0 : stats.score}
           trend={loading ? 0 : stats.trend}
-          userName={userName} 
+          userName={userName}
           nextTopic={nextTopicData}
           topics={topics || []}
-          activities={activities || []}
+          activities={activities}
+          revisedTodayCount={todayRevisedCount}
         />
 
         {/* Pass topics and refresh function to TopicList so it doesn't fetch independently */}
         <TopicList topics={topics} onRefresh={fetchDashboardData} />
-        
+
         <RevisionGuide />
-        <RecentActivity activities={activities}/>
+        <RecentActivity activities={activities} />
       </main>
       <Footer />
     </div>
   );
 };
 
-  export default DashboardPage;
+export default DashboardPage;

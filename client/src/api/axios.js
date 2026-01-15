@@ -1,12 +1,15 @@
 import axios from "axios";
 
 // Hum 'api' variable use kar rahe hain jo interceptors ke saath configured hai
+
+
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-  // Agar aap cookies use kar rahe hain toh niche wali line rakhein, warna ise hata sakte hain
+  // Pehle check karega Environment Variable, agar nahi mila toh localhost use karega
+  baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : "http://localhost:5000/api",
   withCredentials: true, 
 });
 
+// ... baaki interceptors ka code waisa hi rahega
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 

@@ -49,7 +49,9 @@
   transition: all 0.2s;
 }
 
-.back-circle:hover { background: rgba(255, 255, 255, 0.2); }
+.back-circle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 
 .avatar {
   width: 50px;
@@ -87,7 +89,9 @@
   font-weight: 800;
 }
 
-.brand-highlight { color: #818cf8; }
+.brand-highlight {
+  color: #818cf8;
+}
 
 .glass-card h3 {
   font-size: 1.5rem;
@@ -180,7 +184,9 @@
   transition: background 0.2s;
 }
 
-.auth-btn:hover { background: #4338ca; }
+.auth-btn:hover {
+  background: #4338ca;
+}
 
 .auth-switch {
   display: flex;
@@ -242,13 +248,16 @@
 }
 
 @media (max-width: 1024px) {
-  .login-page { 
+  .login-page {
     grid-template-columns: 1fr;
     height: auto;
     min-height: 100vh;
   }
-  .left-panel { display: none; }
-  
+
+  .left-panel {
+    display: none;
+  }
+
   .right-panel {
     padding: 2rem 1.5rem;
     min-height: 100vh;
@@ -256,7 +265,7 @@
     padding-top: 1rem;
     flex-direction: column;
   }
-  
+
   .mobile-back-button {
     display: flex;
     align-items: center;
@@ -273,29 +282,29 @@
     top: 1rem;
     z-index: 100;
   }
-  
+
   .mobile-back-button:hover {
     background: #e5e7eb;
   }
-  
+
   .mobile-back-button .back-arrow {
     font-size: 1.25rem;
     color: #374151;
   }
-  
+
   .auth-form-container {
     width: 100%;
     padding-bottom: 3rem;
   }
-  
+
   .form-title {
     font-size: 1.75rem;
   }
-  
+
   .glass-card {
     padding: 30px;
   }
-  
+
   .glass-card h1 {
     font-size: 2.5rem;
   }
@@ -306,32 +315,32 @@
     padding: 1.5rem 1rem;
     padding-top: 3.5rem;
   }
-  
+
   .auth-form-container {
     padding-bottom: 2.5rem;
     margin-bottom: 1rem;
   }
-  
+
   .form-title {
     font-size: 1.5rem;
   }
-  
+
   .form-subtitle {
     font-size: 0.9rem;
     margin-bottom: 2rem;
   }
-  
+
   .auth-switch {
     flex-wrap: wrap;
     text-align: center;
     justify-content: center;
     margin-top: 1.5rem;
   }
-  
+
   .input-group {
     margin-bottom: 1.25rem;
   }
-  
+
   .auth-btn {
     height: 52px;
     font-size: 1rem;

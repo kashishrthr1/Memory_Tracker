@@ -767,7 +767,7 @@
 
 .topic-labels {
   padding: 0.75rem 1rem;
-  padding-right: 140px;
+  padding-right: 200px;
   /* Offset for the action buttons column in rows */
   font-weight: 600;
   color: #374151;
@@ -875,7 +875,7 @@
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  padding-right: 140px;
+  padding-right: 200px;
   /* Align with header */
   border-radius: 10px;
   background: #f8fafc;
@@ -887,7 +887,7 @@
 .list-item:hover {
   background: #eef2ff;
   /* Reserve space for absolute actions to align with header grid */
-  padding-right: 140px;
+  padding-right: 200px;
 }
 
 @media (max-width: 768px) {
